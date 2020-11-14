@@ -2,7 +2,9 @@ extends Node2D
 
 
 func _ready():
-	var err = get_tree().change_scene("res://addons/triskele/TriskeleEditor.tscn")
+	pass#var t = preload("res://testee.tres")
+	#print(t.test)
+	#var err = get_tree().change_scene("res://addons/triskele/TriskeleEditor.tscn")
 	
-	if err:
-		print("Failed to change to scene")
+	#if err:
+	#	print("Failed to change to scene")

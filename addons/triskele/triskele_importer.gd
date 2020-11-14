@@ -14,7 +14,7 @@ func get_visible_name():
 
 
 func get_recognized_extensions():
-	return ["json"]
+	return ["tristemp"]
 
 
 func get_save_extension():
@@ -51,4 +51,9 @@ func get_option_visibility(option, options):
 
 
 func import(source_file, save_path, options, r_platform_variants, r_gen_files):
-	pass
+	var file = File.new()
+	if file.open(source_file, File.READ) != OK:
+		return FAILED
+	
+	var output = Mesh.new()#TriskeleDialogTree.new()
+	return ResourceSaver.save("%s.%s" % [save_path, get_save_extension()], output)
