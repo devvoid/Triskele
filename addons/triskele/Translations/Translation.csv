@@ -1,0 +1,6 @@
+,en
+TITLE,Triskele
+QUIT_MESSAGE,Are you sure you want to quit?
+QUIT_MESSAGE_UNSAVED,Are you sure you want to quit? There are unsaved changes.
+NEW_FILE_NAME,(new file)
+UNSAVED_FILE_INDICATOR, (*)

@@ -1,0 +1,16 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+
+[deps]
+
+files=[ "res://addons/triskele/Translations/Translation.en.translation" ]
+
+source_file="res://addons/triskele/Translations/Translation.csv"
+dest_files=[ "res://addons/triskele/Translations/Translation.en.translation" ]
+
+[params]
+
+compress=true
+delimiter=0

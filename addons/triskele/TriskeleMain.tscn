@@ -1,0 +1,118 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/triskele/TriskeleMain.gd" type="Script" id=1]
+[ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.2, 0.231373, 0.309804, 1 )
+
+[node name="Main" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 2 )
+custom_styles/panel = SubResource( 1 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBox1" type="VBoxContainer" parent="."]
+anchor_left = 0.005
+anchor_top = 0.005
+anchor_right = 0.995
+anchor_bottom = 0.995
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MenuBar" type="HBoxContainer" parent="VBox1"]
+margin_right = 1267.0
+margin_bottom = 22.0
+
+[node name="File" type="MenuButton" parent="VBox1/MenuBar"]
+margin_right = 35.0
+margin_bottom = 22.0
+text = "File"
+switch_on_hover = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Edit" type="MenuButton" parent="VBox1/MenuBar"]
+margin_left = 39.0
+margin_right = 75.0
+margin_bottom = 22.0
+text = "Edit"
+switch_on_hover = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HSplit1" type="HSplitContainer" parent="VBox1"]
+margin_top = 26.0
+margin_right = 1267.0
+margin_bottom = 712.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offset = 200
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="StatusBar" type="VBoxContainer" parent="VBox1/HSplit1"]
+margin_right = 200.0
+margin_bottom = 686.0
+
+[node name="HBox1" type="HBoxContainer" parent="VBox1/HSplit1/StatusBar"]
+margin_right = 200.0
+
+[node name="Filter" type="LineEdit" parent="VBox1/HSplit1/StatusBar/HBox1"]
+visible = false
+margin_right = 260.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+placeholder_text = "Filter"
+
+[node name="Sidebar" type="Panel" parent="VBox1/HSplit1/StatusBar"]
+margin_top = 4.0
+margin_right = 200.0
+margin_bottom = 686.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Scroll" type="ScrollContainer" parent="VBox1/HSplit1/StatusBar/Sidebar"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="EditorList" type="ItemList" parent="VBox1/HSplit1/StatusBar/Sidebar/Scroll"]
+margin_right = 200.0
+margin_bottom = 682.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+items = [ "(new file)(*)", null, false, "(new file)(*)", null, false ]
+
+[node name="Graphs" type="Control" parent="VBox1/HSplit1"]
+margin_left = 208.0
+margin_right = 1267.0
+margin_bottom = 686.0
+
+[node name="Popups" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="Popups"]
+margin_right = 200.0
+margin_bottom = 70.0
+dialog_text = "There are unsaved changes; are you sure you want to quit?"
+dialog_autowrap = true

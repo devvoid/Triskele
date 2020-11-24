@@ -14,15 +14,15 @@ func get_visible_name():
 
 
 func get_recognized_extensions():
-	return ["tristemp"]
+	return ["json"]
 
 
 func get_save_extension():
-	return "tris"
+	return "res"
 
 
 func get_resource_type():
-	return "TriskeleDialogTree"
+	return "Resource"
 
 
 func get_preset_count():
@@ -40,8 +40,7 @@ func get_preset_name(preset):
 func get_import_options(preset):
 	match preset:
 		Presets.DEFAULT:
-			return [
-			]
+			return []
 		_:
 			return []
 
@@ -55,5 +54,7 @@ func import(source_file, save_path, options, r_platform_variants, r_gen_files):
 	if file.open(source_file, File.READ) != OK:
 		return FAILED
 	
-	var output = Mesh.new()#TriskeleDialogTree.new()
+	var output = TriskeleDialogTree.new()
+	output.test = int(file.get_as_text())
+	
 	return ResourceSaver.save("%s.%s" % [save_path, get_save_extension()], output)

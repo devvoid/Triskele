@@ -1,7 +1,7 @@
 tool
 extends EditorPlugin
 
-const EditorPanel = preload("res://addons/triskele/TriskeleEditor.tscn")
+const EditorPanel = preload("res://addons/triskele/TriskeleMain.tscn")
 const ICON = preload("res://addons/triskele/icon.svg")
 const RESOURCE_SCRIPT = preload("res://addons/triskele/triskele_dialog_tree.gd")
 const IMPORTER = preload("res://addons/triskele/triskele_importer.gd")

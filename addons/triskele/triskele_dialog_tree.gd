@@ -1,4 +1,9 @@
+tool
 extends Resource
 
+class_name TriskeleDialogTree
+
+export(int) var test: int
+
 func _init():
-	pass
+	test = 2

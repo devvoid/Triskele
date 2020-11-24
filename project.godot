@@ -8,9 +8,14 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Resource",
+"class": "TriskeleDialogTree",
+"language": "GDScript",
+"path": "res://addons/triskele/triskele_dialog_tree.gd"
+} ]
 _global_script_class_icons={
-
+"TriskeleDialogTree": ""
 }
 
 [application]
@@ -18,10 +23,20 @@ _global_script_class_icons={
 config/name="Triskele"
 run/main_scene="res://DefaultScene.tscn"
 config/icon="res://icon.png"
+config/auto_accept_quit=false
+
+[display]
+
+window/size/width=1280
+window/size/height=720
 
 [editor_plugins]
 
 enabled=PoolStringArray( "triskele" )
+
+[locale]
+
+translations=PoolStringArray( "res://addons/triskele/Translations/Translation.en.translation" )
 
 [rendering]
 

@@ -2,5 +2,8 @@
 
 [ext_resource path="res://DefaultScene.gd" type="Script" id=1]
 
-[node name="DefaultScene" type="Node2D"]
+[node name="DefaultScene" type="Control"]
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
