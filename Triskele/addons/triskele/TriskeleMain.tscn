@@ -117,5 +117,6 @@ margin_right = 200.0
 margin_bottom = 70.0
 dialog_text = "There are unsaved changes; are you sure you want to quit?"
 dialog_autowrap = true
+[connection signal="item_selected" from="VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList" to="." method="_on_EditorList_item_selected"]
 [connection signal="node_selected" from="VBox1/HSplit1/Graphs/(new file)(*)" to="VBox1/HSplit1/Graphs/(new file)(*)" method="_on_node_selected"]
 [connection signal="node_unselected" from="VBox1/HSplit1/Graphs/(new file)(*)" to="VBox1/HSplit1/Graphs/(new file)(*)" method="_on_node_unselected"]

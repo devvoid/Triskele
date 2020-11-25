@@ -14,6 +14,8 @@ onready var GraphsList = $VBox1/HSplit1/Graphs
 
 onready var Popups = $Popups
 
+onready var current_graph = null
+
 ## GODOT FUNCTIONS
 func _ready():
 	if GraphsList.get_child_count() == 0:
@@ -47,6 +49,9 @@ func _setup_signals():
 
 
 func _add_graph():
+	if current_graph:
+		current_graph.hide()
+	
 	var new_graph = NEW_GRAPH.instance()
 	
 	#var new_name = tr("NEW_FILE_NAME") + tr("UNSAVED_FILE_INDICATOR")
@@ -55,6 +60,8 @@ func _add_graph():
 	
 	GraphsList.add_child(new_graph)
 	EditorList.add_item(new_name)
+	
+	current_graph = new_graph
 
 
 ## SIGNALS
@@ -62,6 +69,15 @@ func _add_graph():
 func _on_exit():
 	get_tree().quit()
 
+
 # When an option in the File menu is selected
-func _on_File_option_selected():
+func _on_File_option_selected(_id):
 	_add_graph()
+	
+
+
+func _on_EditorList_item_selected(index):
+	if current_graph:
+		current_graph.hide()
+	current_graph = GraphsList.get_child(index)
+	current_graph.show()
