@@ -10,3 +10,5 @@ script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+[connection signal="node_selected" from="." to="." method="_on_node_selected"]
+[connection signal="node_unselected" from="." to="." method="_on_node_unselected"]

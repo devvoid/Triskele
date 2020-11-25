@@ -2,11 +2,29 @@
 
 [ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=1]
 
-[node name="Expression" type="GraphNode"]
-margin_right = 32.0
-margin_bottom = 30.0
+[node name="Expression" type="GraphNode" groups=[
+"trisnode",
+]]
+margin_right = 250.0
+margin_bottom = 60.0
 theme = ExtResource( 1 )
 title = "Expression"
+show_close = true
+resizable = true
+slot/0/left_enabled = true
+slot/0/left_type = 0
+slot/0/left_color = Color( 1, 1, 1, 1 )
+slot/0/right_enabled = true
+slot/0/right_type = 0
+slot/0/right_color = Color( 1, 1, 1, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="LineEdit" type="LineEdit" parent="."]
+margin_left = 28.0
+margin_top = 24.0
+margin_right = 222.0
+margin_bottom = 46.0
+size_flags_horizontal = 3
+size_flags_vertical = 3

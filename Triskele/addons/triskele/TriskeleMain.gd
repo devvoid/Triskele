@@ -42,6 +42,8 @@ func _notification(what):
 ## TRISKELE FUNCTIONS
 func _setup_signals():
 	$Popups/ConfirmationDialog.connect("confirmed", self, "_on_exit")
+	
+	MenuBarFile.get_popup().connect("id_pressed", self, "_on_File_option_selected")
 
 
 func _add_graph():
@@ -56,5 +58,10 @@ func _add_graph():
 
 
 ## SIGNALS
+# When the program should close
 func _on_exit():
 	get_tree().quit()
+
+# When an option in the File menu is selected
+func _on_File_option_selected():
+	_add_graph()

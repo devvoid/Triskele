@@ -35,6 +35,7 @@ margin_bottom = 22.0
 margin_right = 35.0
 margin_bottom = 22.0
 text = "File"
+items = [ "New File", null, 0, false, false, 0, 0, null, "", false ]
 switch_on_hover = true
 __meta__ = {
 "_edit_use_anchors_": false
@@ -96,7 +97,7 @@ margin_right = 200.0
 margin_bottom = 682.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-items = [ "(new file)(*)", null, false, "(new file)(*)", null, false ]
+items = [ "(new file)(*)", null, false ]
 
 [node name="Graphs" type="Control" parent="VBox1/HSplit1"]
 margin_left = 208.0
@@ -116,3 +117,5 @@ margin_right = 200.0
 margin_bottom = 70.0
 dialog_text = "There are unsaved changes; are you sure you want to quit?"
 dialog_autowrap = true
+[connection signal="node_selected" from="VBox1/HSplit1/Graphs/(new file)(*)" to="VBox1/HSplit1/Graphs/(new file)(*)" method="_on_node_selected"]
+[connection signal="node_unselected" from="VBox1/HSplit1/Graphs/(new file)(*)" to="VBox1/HSplit1/Graphs/(new file)(*)" method="_on_node_unselected"]
