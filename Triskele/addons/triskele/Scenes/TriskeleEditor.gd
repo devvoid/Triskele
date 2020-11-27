@@ -39,8 +39,10 @@ func _process(_delta):
 		undo_redo.redo()
 
 
+## TRISKELE FUNCTIONS
+# Setup the "Add Node" button
 func _setup_add_node_button():
-	# Add the "ADD NODE" button
+	# 
 	var button = MenuButton.new()
 	
 	# Set the button's name
@@ -59,8 +61,6 @@ func _setup_add_node_button():
 	# Add to scene
 	get_zoom_hbox().add_child(button)
 
-
-## TRISKELE FUNCTIONS
 # Save this file to disk
 # NOTE: This should ONLY be called from _on_save_requested
 # or else the filepath might be null, and Save-As won't work!
@@ -138,3 +138,26 @@ func _on_node_selected(node):
 
 func _on_node_unselected(node):
 	selected_node = null
+
+
+func _on_connection_request(from, from_slot, to, to_slot):
+	undo_redo.create_action("Connect node %s to %s" % [from, to])
+	undo_redo.add_do_method(self, "connect_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	undo_redo.commit_action()
+
+
+func _on_disconnection_request(from, from_slot, to, to_slot):
+	undo_redo.create_action("Disconnect node %s from %s" % [from, to])
+	undo_redo.add_do_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "connect_node", from, from_slot, to, to_slot)
+	undo_redo.commit_action()
+
+
+# Display add-node menu when EditorList is right-clicked
+func _on_GraphEdit_gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_RIGHT and event.pressed:
+			#ContextMenu.rect_position = event.global_position
+			#ContextMenu.show()
+			pass

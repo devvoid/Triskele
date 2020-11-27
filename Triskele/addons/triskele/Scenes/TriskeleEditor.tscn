@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/triskele/Scenes/TriskeleEditor.gd" type="Script" id=1]
+
+[node name="GraphEdit" type="GraphEdit"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+right_disconnects = true
+scroll_offset = Vector2( -640, -360 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="connection_request" from="." to="." method="_on_connection_request"]
+[connection signal="disconnection_request" from="." to="." method="_on_disconnection_request"]
+[connection signal="gui_input" from="." to="." method="_on_GraphEdit_gui_input"]
+[connection signal="node_selected" from="." to="." method="_on_node_selected"]
+[connection signal="node_unselected" from="." to="." method="_on_node_unselected"]

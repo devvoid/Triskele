@@ -1,7 +1,7 @@
 tool
 extends Panel
 
-const NEW_GRAPH = preload("res://addons/triskele/TriskeleEditor.tscn")
+const NEW_GRAPH = preload("res://addons/triskele/Scenes/TriskeleEditor.tscn")
 
 onready var MenuBarFile = $VBox1/MenuBar/File
 onready var MenuBarEdit = $VBox1/MenuBar/Edit
@@ -11,6 +11,8 @@ onready var Filter = $VBox1/HSplit1/StatusBar/HBox1/Filter
 onready var EditorList = $VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList
 
 onready var GraphsList = $VBox1/HSplit1/Graphs
+
+onready var ContextMenu = $ContextMenu
 
 onready var Popups = $Popups
 
@@ -23,6 +25,7 @@ func _ready():
 		_add_graph()
 	
 	_setup_signals()
+	_setup_context_menu()
 
 
 func _notification(what):
@@ -42,10 +45,18 @@ func _notification(what):
 
 
 ## TRISKELE FUNCTIONS
+# Initialize all signals
 func _setup_signals():
 	$Popups/ConfirmationDialog.connect("confirmed", self, "_on_exit")
 	
 	MenuBarFile.get_popup().connect("id_pressed", self, "_on_File_option_selected")
+
+
+# Initialize ContextMenu shortcuts
+func _setup_context_menu():
+	var shortcut_save = ShortCut.new()
+	shortcut_save.shortcut = ProjectSettings.get("input/save")["events"][0]
+	$ContextMenu.set_item_shortcut(0, shortcut_save)
 
 
 func _add_graph():
@@ -61,13 +72,15 @@ func _add_graph():
 	GraphsList.add_child(new_graph)
 	EditorList.add_item(new_name)
 	
+	EditorList.select(EditorList.get_item_count() - 1)
+	
 	current_graph = new_graph
 
 
 ## SIGNALS
 # When the program should close
 func _on_exit():
-	get_tree().quit()
+	get_tree().call_deferred("quit")
 
 
 # When an option in the File menu is selected
@@ -75,9 +88,22 @@ func _on_File_option_selected(_id):
 	_add_graph()
 	
 
-
+# Switch graphs when an item in the EditorList is selected
 func _on_EditorList_item_selected(index):
 	if current_graph:
 		current_graph.hide()
 	current_graph = GraphsList.get_child(index)
 	current_graph.show()
+
+
+# Display context menu when EditorList is right-clicked
+func _on_EditorList_gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_RIGHT and event.pressed:
+			ContextMenu.rect_position = event.global_position
+			ContextMenu.show()
+
+
+# Hide the context menu when the mouse exits it.
+func _on_ContextMenu_mouse_exited():
+	ContextMenu.hide()

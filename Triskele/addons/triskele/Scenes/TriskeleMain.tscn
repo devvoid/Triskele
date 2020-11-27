@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://addons/triskele/TriskeleMain.gd" type="Script" id=1]
+[ext_resource path="res://addons/triskele/Scenes/TriskeleMain.gd" type="Script" id=1]
 [ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=2]
 
 [sub_resource type="StyleBoxFlat" id=1]
@@ -117,6 +117,13 @@ margin_right = 200.0
 margin_bottom = 70.0
 dialog_text = "There are unsaved changes; are you sure you want to quit?"
 dialog_autowrap = true
+
+[node name="ContextMenu" type="PopupMenu" parent="."]
+margin_right = 195.0
+margin_bottom = 106.0
+items = [ "Save", null, 0, false, false, 0, 0, null, "", false, "Save-As", null, 0, false, false, 1, 0, null, "", false, "Close", null, 0, false, false, 2, 0, null, "", false, "Close-All", null, 0, false, false, 3, 0, null, "", false, "Close Other Tabs", null, 0, false, false, 4, 0, null, "", false ]
+[connection signal="gui_input" from="VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList" to="." method="_on_EditorList_gui_input"]
 [connection signal="item_selected" from="VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList" to="." method="_on_EditorList_item_selected"]
 [connection signal="node_selected" from="VBox1/HSplit1/Graphs/(new file)(*)" to="VBox1/HSplit1/Graphs/(new file)(*)" method="_on_node_selected"]
 [connection signal="node_unselected" from="VBox1/HSplit1/Graphs/(new file)(*)" to="VBox1/HSplit1/Graphs/(new file)(*)" method="_on_node_unselected"]
+[connection signal="mouse_exited" from="ContextMenu" to="." method="_on_ContextMenu_mouse_exited"]
