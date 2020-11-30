@@ -59,6 +59,7 @@ func _setup_context_menu():
 	$ContextMenu.set_item_shortcut(0, shortcut_save)
 
 
+# Add a new editor
 func _add_graph():
 	if current_graph:
 		current_graph.hide()
@@ -76,6 +77,22 @@ func _add_graph():
 	
 	current_graph = new_graph
 
+
+# Load a graph
+func _load_graph(load_path: String):
+	if current_graph:
+		current_graph.hide()
+	
+	var new_graph = NEW_GRAPH.instance()
+	
+	new_graph.name = load_path
+	
+	GraphsList.add_child(new_graph)
+	EditorList.add_item(load_path)
+	
+	EditorList.select(EditorList.get_item_count() - 1)
+	
+	current_graph = new_graph
 
 ## SIGNALS
 # When the program should close
@@ -107,3 +124,7 @@ func _on_EditorList_gui_input(event):
 # Hide the context menu when the mouse exits it.
 func _on_ContextMenu_mouse_exited():
 	ContextMenu.hide()
+
+
+func _on_ContextMenu_id_pressed(id):
+	pass # Replace with function body.

@@ -1,5 +1,10 @@
 extends GraphNode
 
+# All text in all different languages
+var text: Dictionary = {
+	
+}
+
 # TODO: Hack; find a better way of doing this
 func _ready():
 	_on_Dialog_resize_request(rect_size)

@@ -23,43 +23,71 @@ var is_saved: bool = false
 # Undo-Redo for this editor
 onready var undo_redo = UndoRedo.new()
 
+# The Add-Node button
+onready var AddNodeButton = null
+
+# The currently-selected node, used to select where the next node goes
 onready var selected_node = null
 
 ## Godot Functions
 func _ready():
 	_setup_add_node_button()
-	scroll_offset = - (rect_size / 2)
+	scroll_offset = -(rect_size / 2)
+	#move_child(get_zoom_hbox(), 0)
 
 
 func _process(_delta):
+	if !visible:
+		return
+	
 	if Input.is_action_just_pressed("undo"):
 		undo_redo.undo()
 	
 	if Input.is_action_just_pressed("redo"):
 		undo_redo.redo()
+	
+	if Input.is_action_just_pressed("save"):
+		_on_save_requested(file_path, false)
+	
+	if Input.is_action_just_pressed("save_as"):
+		_on_save_requested(file_path, true)
+	
+	if !Engine.editor_hint:
+		move_child($TextEditor, get_child_count())
 
 
 ## TRISKELE FUNCTIONS
+# Get rid of all tris nodes to empty the graph
+func _clear_nodes():
+	for i in get_children():
+		if i.is_in_group("trisnodes"):
+			i.queue_free()
+
+
 # Setup the "Add Node" button
 func _setup_add_node_button():
-	# 
-	var button = MenuButton.new()
+	# Create the button
+	AddNodeButton = MenuButton.new()
 	
 	# Set the button's name
-	button.text = "Add Node"
+	AddNodeButton.text = "Add Node"
+	AddNodeButton.name = "AddNode"
 	#button.name = "TRIS_ADD_NODE"
-	button.flat = true
+	AddNodeButton.flat = true
 	
 	# Add entries
-	button.get_popup().add_item("Dialog", 1)
-	button.get_popup().add_item("Expression", 2)
-	button.get_popup().add_item("Option", 3)
-	button.get_popup().add_item("Condition", 4)
+	AddNodeButton.get_popup().add_item("Dialog", 1)
+	AddNodeButton.get_popup().add_item("Expression", 2)
+	AddNodeButton.get_popup().add_item("Option", 3)
+	AddNodeButton.get_popup().add_item("Condition", 4)
 	
-	button.get_popup().connect("id_pressed", self, "_on_add_node")
+	AddNodeButton.get_popup().connect("id_pressed", self, "_on_add_node")
+	
+	AddNodeButton.get_popup().connect("mouse_exited", self, "_on_AddNodeMenu_mouse_exited")
 	
 	# Add to scene
-	get_zoom_hbox().add_child(button)
+	get_zoom_hbox().add_child(AddNodeButton)
+
 
 # Save this file to disk
 # NOTE: This should ONLY be called from _on_save_requested
@@ -67,6 +95,11 @@ func _setup_add_node_button():
 func _save():
 	is_saved = true
 	emit_signal("saved", file_path)
+
+
+# Load file from the disk
+func load_file(_file_path: String):
+	pass
 
 
 ## SIGNALS
@@ -143,14 +176,18 @@ func _on_node_unselected(node):
 func _on_connection_request(from, from_slot, to, to_slot):
 	undo_redo.create_action("Connect node %s to %s" % [from, to])
 	undo_redo.add_do_method(self, "connect_node", from, from_slot, to, to_slot)
+	undo_redo.add_do_method(self, "_on_edit")
 	undo_redo.add_undo_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "_on_edit")
 	undo_redo.commit_action()
 
 
 func _on_disconnection_request(from, from_slot, to, to_slot):
 	undo_redo.create_action("Disconnect node %s from %s" % [from, to])
 	undo_redo.add_do_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	undo_redo.add_do_method(self, "_on_edit")
 	undo_redo.add_undo_method(self, "connect_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "_on_edit")
 	undo_redo.commit_action()
 
 
@@ -158,6 +195,18 @@ func _on_disconnection_request(from, from_slot, to, to_slot):
 func _on_GraphEdit_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_RIGHT and event.pressed:
-			#ContextMenu.rect_position = event.global_position
-			#ContextMenu.show()
-			pass
+			if AddNodeButton:
+				AddNodeButton.get_popup().rect_position = event.global_position
+				AddNodeButton.get_popup().show()
+
+
+# Hide the AddNodeMenu popup when the mouse exits
+func _on_AddNodeMenu_mouse_exited():
+	if AddNodeButton:
+		AddNodeButton.get_popup().hide()
+
+
+func _on_Panel_gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_RIGHT and event.pressed:
+			print("Clicked the panel")
