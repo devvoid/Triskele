@@ -132,6 +132,7 @@ func _on_add_node(node_id):
 	
 	# Connect signals
 	new_node.connect("resize_request", self, "_on_node_resize_request", [new_node])
+	new_node.connect("close_request", self, "_on_node_close_request", [new_node])
 	
 	# If we have a node selected, add this new one to the right of it.
 	if selected_node:
@@ -141,7 +142,12 @@ func _on_add_node(node_id):
 		new_node.offset = new_position
 	
 	# Add to the scene
-	Graph.add_child(new_node, true)
+	undo_redo.create_action("Create node of type %s" % [node_id])
+	undo_redo.add_do_method(self, "_on_edit")
+	undo_redo.add_do_method(Graph, "add_child", new_node, true)
+	undo_redo.add_undo_method(Graph, "remove_child", new_node)
+	undo_redo.add_undo_method(self, "_on_edit")
+	undo_redo.commit_action()
 	
 	# Set node's title to the node name
 	# HAS to be done after add_child, because that's when the unique node name
@@ -174,6 +180,50 @@ func _on_node_selected(node):
 
 func _on_node_unselected(node):
 	selected_node = null
+
+
+func _on_node_close_request(caller):
+	# Get all connections that involve this node...
+	var connections = Graph.get_connection_list()
+	
+	# Remove all connections that don't involve this node
+	for i in connections:
+		if i["from"] != caller.name and i["to"] != caller.name:
+			connections.erase(i)
+	
+	# Make action
+	undo_redo.create_action("Close node %s" % caller.name)
+	
+	# Remove all connections involving this node...
+	for i in connections:
+		undo_redo.add_do_method(
+			Graph,
+			"disconnect_node",
+			i["from"],
+			i["from_port"],
+			i["to"],
+			i["to_port"]
+		)
+	
+	# Remove the node and signal edit
+	undo_redo.add_do_method(Graph, "remove_child", caller)
+	undo_redo.add_do_method(self, "_on_edit")
+	
+	# Re-add connections
+	for i in connections:
+		undo_redo.add_undo_method(
+			Graph,
+			"connect_node",
+			i["from"],
+			i["from_port"],
+			i["to"],
+			i["to_port"]
+		)
+	
+	# Re-add node and signal edit
+	undo_redo.add_undo_method(Graph, "add_child", caller)
+	undo_redo.add_undo_method(self, "_on_edit")
+	undo_redo.commit_action()
 
 
 func _on_connection_request(from, from_slot, to, to_slot):
