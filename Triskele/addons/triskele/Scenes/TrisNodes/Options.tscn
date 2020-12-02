@@ -24,17 +24,17 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="TopBar" type="HBoxContainer" parent="."]
 margin_left = 28.0
 margin_top = 24.0
 margin_right = 222.0
 margin_bottom = 48.0
 
-[node name="UseConditions" type="CheckBox" parent="HBoxContainer"]
+[node name="UseConditions" type="CheckBox" parent="TopBar"]
 margin_right = 24.0
 margin_bottom = 24.0
 
-[node name="Label" type="Label" parent="HBoxContainer"]
+[node name="Label" type="Label" parent="TopBar"]
 margin_left = 28.0
 margin_top = 1.0
 margin_right = 133.0
@@ -45,23 +45,24 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VSeparator" type="VSeparator" parent="HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="TopBar"]
 margin_left = 137.0
 margin_right = 149.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
 custom_styles/separator = SubResource( 1 )
 
-[node name="AddButton" type="Button" parent="HBoxContainer"]
+[node name="AddButton" type="Button" parent="TopBar"]
 margin_left = 153.0
 margin_right = 173.0
 margin_bottom = 24.0
 text = "+"
 
-[node name="RemoveButton" type="Button" parent="HBoxContainer"]
+[node name="RemoveButton" type="Button" parent="TopBar"]
 margin_left = 177.0
 margin_right = 194.0
 margin_bottom = 24.0
 text = "-"
-[connection signal="pressed" from="HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
-[connection signal="pressed" from="HBoxContainer/RemoveButton" to="." method="_on_RemoveButton_pressed"]
+[connection signal="toggled" from="TopBar/UseConditions" to="." method="_on_UseConditions_toggled"]
+[connection signal="pressed" from="TopBar/AddButton" to="." method="_on_AddButton_pressed"]
+[connection signal="pressed" from="TopBar/RemoveButton" to="." method="_on_RemoveButton_pressed"]

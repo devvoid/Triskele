@@ -28,6 +28,17 @@ func _ready():
 	_setup_context_menu()
 
 
+func _process(_delta):
+	if !current_graph:
+		return
+	
+	if Input.is_action_just_pressed("undo"):
+		current_graph.undo()
+	
+	if Input.is_action_just_pressed("redo"):
+		current_graph.redo()
+
+
 func _notification(what):
 	if Engine.editor_hint:
 		return

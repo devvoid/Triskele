@@ -42,24 +42,23 @@ func _ready():
 		TextEditor.hide()
 
 
-func _process(_delta):
-	if !visible:
-		return
-	
-	if Input.is_action_just_pressed("undo"):
-		undo_redo.undo()
-	
-	if Input.is_action_just_pressed("redo"):
-		undo_redo.redo()
-	
-	if Input.is_action_just_pressed("save"):
-		_on_save_requested(file_path, false)
-	
-	if Input.is_action_just_pressed("save_as"):
-		_on_save_requested(file_path, true)
-
-
 ## TRISKELE FUNCTIONS
+# Undo the last action
+func undo():
+	if TextEditor.visible:
+		TextEditor.get_node("TabContainer/en_us").undo()
+	else:
+		undo_redo.undo()
+
+
+# Redo the last undone action
+func redo():
+	if TextEditor.visible:
+		TextEditor.get_node("TabContainer/en_us").redo()
+	else:
+		undo_redo.redo()
+
+
 # Get rid of all tris nodes to empty the graph
 func _clear_nodes():
 	for i in Graph.get_children():
@@ -93,9 +92,7 @@ func _setup_add_node_button():
 
 
 # Save this file to disk
-# NOTE: This should ONLY be called from _on_save_requested
-# or else the filepath might be null, and Save-As won't work!
-func _save():
+func save_file():
 	is_saved = true
 	emit_signal("saved", file_path)
 
@@ -106,17 +103,9 @@ func load_file(_file_path: String):
 
 
 ## SIGNALS
-# Handle updating the file path, then save file.
-func _on_save_requested(new_path: String, save_as: bool = false):
-	if file_path == "" or save_as:
-		file_path = new_path
-	
-	_save()
-
-
 # Add node to the graph
 func _on_add_node(node_id):
-	# Make the node
+	# Make the node, and do any node-specific setup
 	var new_node
 	match node_id:
 		1:
@@ -125,6 +114,8 @@ func _on_add_node(node_id):
 			new_node = NodeExpression.instance()
 		3:
 			new_node = NodeOptions.instance()
+			new_node.connect("add_pressed", self, "_on_Options_add_pressed", [new_node])
+			new_node.connect("remove_pressed", self, "_on_Options_remove_pressed", [new_node])
 		4:
 			new_node = NodeCondition.instance()
 		_:
@@ -263,6 +254,7 @@ func _on_AddNodeMenu_mouse_exited():
 	AddNodeButton.get_popup().hide()
 
 
+# Close the TextEditor when the user clicks off it.
 func _on_Panel_gui_input(event):
 	if Engine.editor_hint:
 		return
@@ -275,3 +267,43 @@ func _on_Panel_gui_input(event):
 			return
 		
 		TextEditor.hide()
+
+
+# Add a new option to an Options node
+func _on_Options_add_pressed(caller):
+	var new_option = HSplitContainer.new()
+	
+	var condition = LineEdit.new()
+	condition.name = "Condition"
+	condition.placeholder_text = "Condition"
+	condition.size_flags_horizontal = SIZE_EXPAND_FILL
+	
+	var option_text = LineEdit.new()
+	option_text.name = "OptionText"
+	option_text.placeholder_text = "Option Text"
+	option_text.size_flags_horizontal = SIZE_EXPAND_FILL
+	
+	new_option.add_child(condition)
+	new_option.add_child(option_text)
+	
+	if !caller.conditions_visible:
+		condition.visible = false
+	
+	undo_redo.create_action("Add option to %s" % [caller.name])
+	undo_redo.add_do_method(caller, "add_child", new_option)
+	undo_redo.add_undo_method(caller, "remove_child", new_option)
+	undo_redo.commit_action()
+
+
+# Remove the last option from an Options node
+func _on_Options_remove_pressed(caller):
+	# If there's only one child, then there are no options; abort
+	if caller.get_child_count() == 1:
+		return
+	
+	var option = caller.get_child(caller.get_child_count() - 1)
+	
+	undo_redo.create_action("Remove option from %s" % [caller.name])
+	undo_redo.add_do_method(caller, "remove_child", option)
+	undo_redo.add_undo_method(caller, "add_child", option)
+	undo_redo.commit_action()
