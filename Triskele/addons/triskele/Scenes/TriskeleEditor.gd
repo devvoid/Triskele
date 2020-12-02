@@ -147,7 +147,34 @@ func _save_file_internal():
 		if !i.is_in_group("trisnode"):
 			continue
 		
-		print("%s is a %s" % [i.name, i.get_class()])
+		# Write info that all nodes have (name, position, size)
+		
+		# Write node-specific info
+		match i.get_class():
+			# Start and End have no special parameters at this stage.
+			"TrisStartNode": pass
+			"TrisEndNode": pass
+			
+			# Dialog node
+			# TODO: For now, just write en_us to the file. In future, write
+			# all text to a separate CSV file.
+			"TrisDialogNode":
+				pass
+			
+			# Expression node just needs to write its expression
+			"TrisExpressionNode":
+				pass
+			
+			# Options node needs to write its options
+			"TrisOptionsNode":
+				pass
+			
+			# Condition node just needs to write its condition
+			"TrisConditionNode":
+				pass
+			# Default is used as an error handler
+			_:
+				OS.alert("Tried to save unknown node type %s; skipping" % [i.get_class()])
 	
 	## Step 2: Sort connections list into a more easily-usable state
 	var raw_connection_list = Graph.get_connection_list()
@@ -184,18 +211,25 @@ func _save_file_internal():
 	file.store_string(to_json(output))
 	file.close()
 	
+	# Alert the main scene that a save just happened
 	is_saved = true
 	emit_signal("save_finished")
 
 
 # Load file from the disk
 func load_file(load_path: String):
+	# Load name and data from the provided file
 	file_path = load_path
 	name = load_path.get_file()
 	
 	var file = File.new()
 	file.open(load_path, File.READ)
-	var json = file.read_all_lines()
+	var json = file.get_as_text()
+	
+	# Load the data
+	## Step 1: Load all nodes
+	
+	## Step 2: Connect all nodes
 
 
 ## SIGNALS

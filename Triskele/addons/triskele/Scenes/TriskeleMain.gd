@@ -13,9 +13,9 @@ onready var EditorList = $VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList
 
 onready var GraphsList = $VBox1/HSplit1/Graphs
 
-onready var ContextMenu = $ContextMenu
-
-onready var Popups = $Popups
+onready var ConfirmQuit = $Popups/ConfirmationDialog
+onready var ContextMenu = $Popups/ContextMenu
+onready var LoadDialog = $Popups/Load
 
 var current_graph = null
 
@@ -55,7 +55,7 @@ func _notification(what):
 		for i in GraphsList.get_children():
 			# If one of them isn't saved, show the confirmation dialog and stop.
 			if i.is_saved == false:
-				$Popups.get_node("ConfirmationDialog").popup_centered()
+				ConfirmQuit.popup_centered()
 				return
 		
 		# If all the graphs are saved, just close.
@@ -65,7 +65,7 @@ func _notification(what):
 ## TRISKELE FUNCTIONS
 # Initialize all signals
 func _setup_signals():
-	$Popups/ConfirmationDialog.connect("confirmed", self, "_on_exit")
+	ConfirmQuit.connect("confirmed", self, "_on_exit")
 	
 	MenuBarFile.get_popup().connect("id_pressed", self, "_on_File_option_selected")
 
@@ -155,7 +155,7 @@ func _on_File_option_selected(id):
 			
 			_save_graph(true, current_graph)
 		3:
-			$Load.popup()
+			LoadDialog.popup()
 
 func _on_Edit_option_selected(id):
 	if !current_graph:
