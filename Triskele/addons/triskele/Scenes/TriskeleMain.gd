@@ -37,6 +37,21 @@ func _process(_delta):
 	
 	if Input.is_action_just_pressed("redo"):
 		current_graph.redo()
+	
+	if Input.is_action_just_pressed("save"):
+		# Save file
+		current_graph.save_file()
+		
+		# Wait until saving is complete
+		yield(current_graph, "save_finished")
+		
+		# Modify name in the item list
+	
+	if Input.is_action_just_pressed("save_as"):
+		current_graph.save_file(true)
+		yield(current_graph, "save_finished")
+		
+		# Modify name in the item list
 
 
 func _notification(what):
@@ -63,11 +78,14 @@ func _setup_signals():
 	MenuBarFile.get_popup().connect("id_pressed", self, "_on_File_option_selected")
 
 
-# Initialize ContextMenu shortcuts
+# Initialize ContextMenu
 func _setup_context_menu():
+	# Shortcuts (do we need these?)
 	var shortcut_save = ShortCut.new()
 	shortcut_save.shortcut = ProjectSettings.get("input/save")["events"][0]
 	$ContextMenu.set_item_shortcut(0, shortcut_save)
+	
+	# Signals
 
 
 # Add a new editor
@@ -96,14 +114,17 @@ func _load_graph(load_path: String):
 	
 	var new_graph = NEW_GRAPH.instance()
 	
-	new_graph.name = load_path
+	new_graph.name = load_path.get_file()
+	
+	new_graph.load_file(load_path)
 	
 	GraphsList.add_child(new_graph)
-	EditorList.add_item(load_path)
+	EditorList.add_item(load_path.get_file())
 	
 	EditorList.select(EditorList.get_item_count() - 1)
 	
 	current_graph = new_graph
+
 
 ## SIGNALS
 # When the program should close
@@ -139,3 +160,8 @@ func _on_ContextMenu_mouse_exited():
 
 func _on_ContextMenu_id_pressed(id):
 	pass # Replace with function body.
+
+
+# Load the file selected
+func _on_Load_file_selected(path):
+	_load_graph(path)

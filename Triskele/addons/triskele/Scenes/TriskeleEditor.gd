@@ -1,8 +1,8 @@
 tool
 extends Control
 
-signal saved(file_path)
-signal edited()
+signal save_finished
+signal edited
 
 # TODO: Maybe make scripts for the nodes and use class_name to remove this
 onready var NodeStart = preload("res://addons/triskele/Scenes/TrisNodes/Start.tscn")
@@ -16,7 +16,7 @@ onready var NodeEnd = preload("res://addons/triskele/Scenes/TrisNodes/End.tscn")
 var file_path: String = ""
 
 # Whether or not all changes have been saved.
-# This is set to false in _on_edit, and true in _save
+# This is set to false in _on_edit, and true in save_file
 # DO NOT SET THIS ANYWHERE ELSE
 var is_saved: bool = false
 
@@ -29,17 +29,33 @@ onready var AddNodeButton = null
 # The currently-selected node, used to select where the next node goes
 onready var selected_node = null
 
+# The graph itself
 onready var Graph = $GraphEdit
 
+# The text editor
 onready var TextEditor = $TextEditor
 
 ## Godot Functions
 func _ready():
+	# Add-Node button
 	_setup_add_node_button()
+	
+	# Set scroll to the middle of the screen
 	Graph.scroll_offset = -(rect_size / 2)
 	
-	if !Engine.editor_hint:
-		TextEditor.hide()
+	# Hide text editor
+	TextEditor.hide()
+	
+	# Add Start and End nodes to the graph
+	var start = NodeStart.instance()
+	start.name = "Start"
+	start.offset.x -= 400
+	Graph.add_child(start)
+	
+	var end = NodeEnd.instance()
+	end.name = "End"
+	end.offset.x += 400
+	Graph.add_child(end)
 
 
 ## TRISKELE FUNCTIONS
@@ -91,15 +107,56 @@ func _setup_add_node_button():
 	Graph.get_zoom_hbox().add_child(AddNodeButton)
 
 
-# Save this file to disk
-func save_file():
+# Resolve filepath and save file
+func save_file(save_as: bool = false):
+	# If the user used Save-As, or if there isn't a filepath, use the save
+	# dialog. This will call _save_file_internal once the filepath is set.
+	if save_as or file_path == "":
+		$SaveDialog.popup()
+	else:
+		_save_file_internal()
+	
+	# TODO: This and _save_file_internal could be combined if you could yield
+	# on $SaveDialog until file_selected is called, but that doesn't work if
+	# the user clicks off the SaveDialog instead of selecting a path. This is
+	# because there's no known way of terminating the function if another signal
+	# is called
+
+
+# Save the file to disk
+func _save_file_internal():
+	var output = {
+		"version_major": 1,
+		"version_minor": 0,
+		"nodes": {}
+	}
+	
+	# Use a second dictionary for the nodes to decrease nesting
+	var nodes: Dictionary
+	
+	# Fill dictionary with nodes
+	
+	# Add nodes to main dictionary
+	output["nodes"] = nodes
+	
+	# Save to file
+	var file = File.new()
+	file.open(file_path, File.WRITE)
+	file.store_string(to_json(output))
+	file.close()
+	
 	is_saved = true
-	emit_signal("saved", file_path)
+	emit_signal("save_finished")
 
 
 # Load file from the disk
-func load_file(_file_path: String):
-	pass
+func load_file(load_path: String):
+	file_path = load_path
+	name = load_path.get_file()
+	
+	var file = File.new()
+	file.open(load_path, File.READ)
+	var json;
 
 
 ## SIGNALS
@@ -159,6 +216,7 @@ func _on_edit():
 
 # When a node is requested to be resized
 func _on_node_resize_request(new_minsize, caller):
+	# TODO: Only Dialog gets resized on both axes, all others only resize on X
 	undo_redo.create_action("Resize node %s" % caller.name, UndoRedo.MERGE_ENDS)
 	undo_redo.add_do_property(caller, "rect_size", new_minsize)
 	undo_redo.add_undo_property(caller, "rect_size", caller.rect_size)
@@ -228,9 +286,9 @@ func _on_connection_request(from, from_slot, to, to_slot):
 
 func _on_disconnection_request(from, from_slot, to, to_slot):
 	undo_redo.create_action("Disconnect node %s from %s" % [from, to])
-	undo_redo.add_do_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	undo_redo.add_do_method(Graph, "disconnect_node", from, from_slot, to, to_slot)
 	undo_redo.add_do_method(self, "_on_edit")
-	undo_redo.add_undo_method(self, "connect_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(Graph, "connect_node", from, from_slot, to, to_slot)
 	undo_redo.add_undo_method(self, "_on_edit")
 	undo_redo.commit_action()
 
@@ -307,3 +365,8 @@ func _on_Options_remove_pressed(caller):
 	undo_redo.add_do_method(caller, "remove_child", option)
 	undo_redo.add_undo_method(caller, "add_child", option)
 	undo_redo.commit_action()
+
+
+func _on_SaveDialog_file_selected(path):
+	file_path = path
+	_save_file_internal()

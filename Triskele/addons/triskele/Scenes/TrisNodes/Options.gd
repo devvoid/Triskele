@@ -3,6 +3,7 @@ extends GraphNode
 signal add_pressed
 signal remove_pressed
 
+
 var conditions_visible: bool = false
 
 

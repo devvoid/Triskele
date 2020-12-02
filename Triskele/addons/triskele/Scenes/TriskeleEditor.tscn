@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://addons/triskele/Scenes/TriskeleEditor.gd" type="Script" id=1]
+[ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=2]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0, 0, 0, 0.796078 )
@@ -16,6 +17,7 @@ __meta__ = {
 [node name="GraphEdit" type="GraphEdit" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+right_disconnects = true
 scroll_offset = Vector2( -640, -360 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -58,6 +60,18 @@ highlight_current_line = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="SaveDialog" type="FileDialog" parent="."]
+visible = true
+anchor_left = 0.1
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.9
+theme = ExtResource( 2 )
+access = 2
+filters = PoolStringArray( "*.tris ; Triskele file" )
+current_dir = "/home/void/Desktop/devvoid/Triskele/Triskele"
+current_path = "/home/void/Desktop/devvoid/Triskele/Triskele/"
 [connection signal="gui_input" from="." to="." method="_on_GraphEdit_gui_input"]
 [connection signal="connection_request" from="GraphEdit" to="." method="_on_connection_request"]
 [connection signal="disconnection_request" from="GraphEdit" to="." method="_on_disconnection_request"]
@@ -65,3 +79,4 @@ __meta__ = {
 [connection signal="node_selected" from="GraphEdit" to="." method="_on_node_selected"]
 [connection signal="node_unselected" from="GraphEdit" to="." method="_on_node_unselected"]
 [connection signal="gui_input" from="TextEditor/Panel" to="." method="_on_Panel_gui_input"]
+[connection signal="file_selected" from="SaveDialog" to="." method="_on_SaveDialog_file_selected"]
