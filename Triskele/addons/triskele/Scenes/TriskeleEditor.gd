@@ -12,6 +12,12 @@ onready var NodeOptions = preload("res://addons/triskele/Scenes/TrisNodes/Option
 onready var NodeCondition = preload("res://addons/triskele/Scenes/TrisNodes/Condition.tscn")
 onready var NodeEnd = preload("res://addons/triskele/Scenes/TrisNodes/End.tscn")
 
+# The graph itself
+onready var Graph = $GraphEdit
+
+# The text editor
+onready var TextEditor = $TextEditor
+
 # File path. "" represents no path (when the graph is new)
 var file_path: String = ""
 
@@ -21,19 +27,13 @@ var file_path: String = ""
 var is_saved: bool = false
 
 # Undo-Redo for this editor
-onready var undo_redo = UndoRedo.new()
+var undo_redo = UndoRedo.new()
 
 # The Add-Node button
-onready var AddNodeButton = null
+var AddNodeButton = null
 
 # The currently-selected node, used to select where the next node goes
-onready var selected_node = null
-
-# The graph itself
-onready var Graph = $GraphEdit
-
-# The text editor
-onready var TextEditor = $TextEditor
+var selected_node = null
 
 ## Godot Functions
 func _ready():
@@ -47,6 +47,7 @@ func _ready():
 	TextEditor.hide()
 	
 	# Add Start and End nodes to the graph
+	# TODO: Replace 400 with calculation based on size of the screen
 	var start = NodeStart.instance()
 	start.name = "Start"
 	start.offset.x -= 400
@@ -56,6 +57,10 @@ func _ready():
 	end.name = "End"
 	end.offset.x += 400
 	Graph.add_child(end)
+	
+	# Select the Start node
+	selected_node = start
+	Graph.set_selected(start)
 
 
 ## TRISKELE FUNCTIONS
@@ -136,6 +141,40 @@ func _save_file_internal():
 	
 	# Fill dictionary with nodes
 	
+	## Step 1: Fill with nodes
+	for i in Graph.get_children():
+		# If it isn't a tris node, we don't care, ignore it.
+		if !i.is_in_group("trisnode"):
+			continue
+		
+		print("%s is a %s" % [i.name, i.get_class()])
+	
+	## Step 2: Sort connections list into a more easily-usable state
+	var raw_connection_list = Graph.get_connection_list()
+	
+	# Format:
+	# "node_name": [ "connection1", "connection2", ...]
+	# This can be roughly translated into connect_node("node_name", array position, "other_node"[array position], 0)
+	# The to_port is ignored because all nodes only have one input.
+	var connection_list = {}
+	
+	# Fill connection list
+	for connection in raw_connection_list:
+		# If this node doesn't have an entry in the list yet,
+		# make it an empty array.
+		if !connection_list.has(connection.from):
+			connection_list[connection.from] = []
+		
+		# If the array is too small to contain the new connection, resize it
+		# TODO: See if there's a way for variably-sized arrays in Godot
+		if connection_list[connection.from].size() <= connection.from_port:
+			connection_list[connection.from].resize(connection.from_port + 1)
+		
+		# Setup the connection
+		connection_list[connection.from][connection.from_port] = connection.to
+	
+	## Step 3: Add all connections
+	
 	# Add nodes to main dictionary
 	output["nodes"] = nodes
 	
@@ -156,7 +195,7 @@ func load_file(load_path: String):
 	
 	var file = File.new()
 	file.open(load_path, File.READ)
-	var json;
+	var json = file.read_all_lines()
 
 
 ## SIGNALS
@@ -210,8 +249,9 @@ func _on_add_node(node_id):
 # Called whenever the graph is edited; sets is_saved to false,
 # and signals the main scene to add the (*) to the file path.
 func _on_edit():
-	is_saved = false
-	emit_signal("edited")
+	if is_saved:
+		is_saved = false
+		emit_signal("edited")
 
 
 # When a node is requested to be resized

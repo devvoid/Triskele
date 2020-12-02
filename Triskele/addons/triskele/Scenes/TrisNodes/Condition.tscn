@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=1]
+[ext_resource path="res://addons/triskele/Scenes/TrisNodes/Condition.gd" type="Script" id=2]
 
 [node name="Condition" type="GraphNode" groups=[
 "trisnode",
@@ -23,6 +24,7 @@ slot/1/left_color = Color( 1, 1, 1, 1 )
 slot/1/right_enabled = true
 slot/1/right_type = 0
 slot/1/right_color = Color( 1, 0, 0, 1 )
+script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

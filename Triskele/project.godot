@@ -10,9 +10,34 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "GraphNode",
-"class": "BaseNode",
+"class": "TrisConditionNode",
 "language": "GDScript",
-"path": "res://addons/triskele/Scenes/TrisNodes/BaseNode.gd"
+"path": "res://addons/triskele/Scenes/TrisNodes/Condition.gd"
+}, {
+"base": "GraphNode",
+"class": "TrisDialogNode",
+"language": "GDScript",
+"path": "res://addons/triskele/Scenes/TrisNodes/Dialog.gd"
+}, {
+"base": "GraphNode",
+"class": "TrisEndNode",
+"language": "GDScript",
+"path": "res://addons/triskele/Scenes/TrisNodes/End.gd"
+}, {
+"base": "GraphNode",
+"class": "TrisExpressionNode",
+"language": "GDScript",
+"path": "res://addons/triskele/Scenes/TrisNodes/Expression.gd"
+}, {
+"base": "GraphNode",
+"class": "TrisOptionsNode",
+"language": "GDScript",
+"path": "res://addons/triskele/Scenes/TrisNodes/Options.gd"
+}, {
+"base": "GraphNode",
+"class": "TrisStartNode",
+"language": "GDScript",
+"path": "res://addons/triskele/Scenes/TrisNodes/Start.gd"
 }, {
 "base": "Resource",
 "class": "TriskeleDialogTree",
@@ -20,7 +45,12 @@ _global_script_classes=[ {
 "path": "res://addons/triskele/triskele_dialog_tree.gd"
 } ]
 _global_script_class_icons={
-"BaseNode": "",
+"TrisConditionNode": "",
+"TrisDialogNode": "",
+"TrisEndNode": "",
+"TrisExpressionNode": "",
+"TrisOptionsNode": "",
+"TrisStartNode": "",
 "TriskeleDialogTree": ""
 }
 

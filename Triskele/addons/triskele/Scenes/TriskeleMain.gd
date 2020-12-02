@@ -5,6 +5,7 @@ const NEW_GRAPH = preload("res://addons/triskele/Scenes/TriskeleEditor.tscn")
 
 onready var MenuBarFile = $VBox1/MenuBar/File
 onready var MenuBarEdit = $VBox1/MenuBar/Edit
+onready var MenuBarHelp = $VBox1/MenuBar/Help
 
 onready var Filter = $VBox1/HSplit1/StatusBar/HBox1/Filter
 
@@ -16,7 +17,7 @@ onready var ContextMenu = $ContextMenu
 
 onready var Popups = $Popups
 
-onready var current_graph = null
+var current_graph = null
 
 ## GODOT FUNCTIONS
 func _ready():
@@ -39,19 +40,10 @@ func _process(_delta):
 		current_graph.redo()
 	
 	if Input.is_action_just_pressed("save"):
-		# Save file
-		current_graph.save_file()
-		
-		# Wait until saving is complete
-		yield(current_graph, "save_finished")
-		
-		# Modify name in the item list
+		_save_graph(false, current_graph)
 	
 	if Input.is_action_just_pressed("save_as"):
-		current_graph.save_file(true)
-		yield(current_graph, "save_finished")
-		
-		# Modify name in the item list
+		_save_graph(true, current_graph)
 
 
 func _notification(what):
@@ -99,6 +91,8 @@ func _add_graph():
 	var new_name = "(new file)(*)"
 	new_graph.name = new_name
 	
+	new_graph.connect("edited", self, "_on_Graph_edited", [new_graph])
+	
 	GraphsList.add_child(new_graph)
 	EditorList.add_item(new_name)
 	
@@ -126,6 +120,19 @@ func _load_graph(load_path: String):
 	current_graph = new_graph
 
 
+# Save a graph
+func _save_graph(save_as, graph):
+	# Tell the graph to start saving
+	graph.save_file(save_as)
+	
+	# Wait until finished
+	yield(graph, "save_finished")
+	
+	# Update ItemList
+	var index = GraphsList.get_children().find(graph)
+	EditorList.set_item_text(index, graph.file_path.get_file())
+
+
 ## SIGNALS
 # When the program should close
 func _on_exit():
@@ -133,9 +140,35 @@ func _on_exit():
 
 
 # When an option in the File menu is selected
-func _on_File_option_selected(_id):
-	_add_graph()
+func _on_File_option_selected(id):
+	match id:
+		0:
+			_add_graph()
+		1:
+			if !current_graph:
+				return
+			
+			_save_graph(false, current_graph)
+		2:
+			if !current_graph:
+				return
+			
+			_save_graph(true, current_graph)
+		3:
+			$Load.popup()
+
+func _on_Edit_option_selected(id):
+	if !current_graph:
+		return
 	
+	match id:
+		0:
+			current_graph.undo()
+		1:
+			current_graph.redo()
+
+func _on_Help_option_selected(_id):
+	OS.alert("There is no help.")
 
 # Switch graphs when an item in the EditorList is selected
 func _on_EditorList_item_selected(index):
@@ -165,3 +198,9 @@ func _on_ContextMenu_id_pressed(id):
 # Load the file selected
 func _on_Load_file_selected(path):
 	_load_graph(path)
+
+
+# Mark graph as not-saved
+func _on_Graph_edited(graph):
+	var index = GraphsList.get_children().find(graph)
+	EditorList.set_item_text(index, graph.file_path.get_file() + "(*)")

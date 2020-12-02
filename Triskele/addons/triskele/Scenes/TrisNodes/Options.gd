@@ -1,10 +1,21 @@
 extends GraphNode
 
+class_name TrisOptionsNode
+
+
 signal add_pressed
 signal remove_pressed
 
 
 var conditions_visible: bool = false
+
+
+func get_class():
+	return "TrisOptionsNode"
+
+
+func is_class(name):
+	return name == get_class() or .is_class(name)
 
 
 func _on_AddButton_pressed():
