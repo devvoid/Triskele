@@ -4,7 +4,7 @@ extends Control
 signal save_finished
 signal edited
 
-# TODO: Maybe make scripts for the nodes and use class_name to remove this
+# TODO: Use class names to remove these
 onready var NodeStart = preload("res://addons/triskele/Scenes/TrisNodes/Start.tscn")
 onready var NodeDialog = preload("res://addons/triskele/Scenes/TrisNodes/Dialog.tscn")
 onready var NodeExpression = preload("res://addons/triskele/Scenes/TrisNodes/Expression.tscn")
@@ -248,6 +248,26 @@ func _save_file_internal():
 		connection_list[connection.from][connection.from_port] = connection.to
 	
 	## Step 3: Add all connections
+	for key in connection_list.keys():
+		# End has no connections.
+		
+		# For Start, Dialog, and Expression, set "next" to first member of the
+		# connections array
+		if nodes[key].has("next"):
+			nodes[key]["next"] = connection_list[key][0]
+		
+		# For Condition, set true to the first member and false to the second
+		elif nodes[key].has("next_true"):
+			nodes[key]["next_true"] = connection_list[key][0]
+			nodes[key]["next_false"] = connection_list[key][1]
+		
+		# Options is just Dialog but in a loop.
+		elif nodes[key].has("options"):
+			for i in connection_list[key].size():
+				nodes[key]["options"][i]["next"] = connection_list[key][i]
+		
+		else:
+			print("[ERROR]: Unknown node type!")
 	
 	# Add nodes to main dictionary
 	output["nodes"] = nodes
@@ -516,3 +536,6 @@ func _on_CloseTextEditor_pressed():
 	# Save the data back to the node
 	selected_node.set_text("en_US", TextEditor.get_node("TabContainer/en_US").text)
 	selected_node.translation_key = TextEditor.get_node("BottomPanel/TranslationKey").text
+	
+	# Hide the text editor
+	TextEditor.hide()
