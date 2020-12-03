@@ -23,12 +23,16 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="TextEdit" type="TextEdit" parent="."]
+[node name="Preview" type="Label" parent="."]
 margin_left = 28.0
 margin_top = 24.0
-margin_right = 222.0
-margin_bottom = 32.0
+margin_right = 378.0
+margin_bottom = 33.0
+hint_tooltip = "Click to open dialog editor"
+mouse_filter = 0
+mouse_default_cursor_shape = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
-wrap_enabled = true
+autowrap = true
+clip_text = true
 [connection signal="resize_request" from="." to="." method="_on_Dialog_resize_request"]

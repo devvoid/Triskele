@@ -23,10 +23,11 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="."]
+[node name="Expression" type="LineEdit" parent="."]
 margin_left = 28.0
 margin_top = 24.0
 margin_right = 222.0
 margin_bottom = 46.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+placeholder_text = "Expression"

@@ -148,33 +148,65 @@ func _save_file_internal():
 			continue
 		
 		# Write info that all nodes have (name, position, size)
+		var current_node = {}
+		current_node["name"] = i.name
+		current_node["position"] = i.rect_position
+		current_node["size"] = i.rect_size
 		
-		# Write node-specific info
+		# Write node-specific info, and type
 		match i.get_class():
 			# Start and End have no special parameters at this stage.
-			"TrisStartNode": pass
-			"TrisEndNode": pass
+			"TrisStartNode":
+				current_node["type"] = "Start"
+				current_node["next"] = "NULL"
+			"TrisEndNode":
+				current_node["type"] = "End"
 			
 			# Dialog node
 			# TODO: For now, just write en_us to the file. In future, write
 			# all text to a separate CSV file.
 			"TrisDialogNode":
-				pass
+				current_node["type"] = "Dialog"
+				current_node["next"] = "NULL"
+				print("unfinished!!!")
 			
 			# Expression node just needs to write its expression
 			"TrisExpressionNode":
-				pass
+				current_node["type"] = "Expression"
+				current_node["expression"] = i.get_node("Expression").get_text()
+				current_node["next"] = "NULL"
 			
 			# Options node needs to write its options
 			"TrisOptionsNode":
-				pass
+				current_node["type"] = "Options"
+				current_node["uses_conditions"] = i.conditions_visible
+				current_node["options"] = []
+				
+				for j in i.get_children():
+					# Skip top bar
+					if j is HBoxContainer:
+						continue
+					
+					var new_option = {}
+					new_option["option"] = j.get_node("OptionText").get_text()
+					new_option["condition"] = j.get_node("Condition").get_text()
+					new_option["next"] = "NULL"
+					
+					current_node["options"].append(new_option)
 			
 			# Condition node just needs to write its condition
 			"TrisConditionNode":
-				pass
+				current_node["type"] = "Condition"
+				current_node["condition"] = i.get_node("Condition").get_text()
+				current_node["next_true"] = "NULL"
+				current_node["next_false"] = "NULL"
+			
 			# Default is used as an error handler
 			_:
 				OS.alert("Tried to save unknown node type %s; skipping" % [i.get_class()])
+		
+		# All the node data is written; add to the dictionary
+		nodes[i.name] = current_node
 	
 	## Step 2: Sort connections list into a more easily-usable state
 	var raw_connection_list = Graph.get_connection_list()
@@ -193,7 +225,6 @@ func _save_file_internal():
 			connection_list[connection.from] = []
 		
 		# If the array is too small to contain the new connection, resize it
-		# TODO: See if there's a way for variably-sized arrays in Godot
 		if connection_list[connection.from].size() <= connection.from_port:
 			connection_list[connection.from].resize(connection.from_port + 1)
 		
@@ -208,7 +239,7 @@ func _save_file_internal():
 	# Save to file
 	var file = File.new()
 	file.open(file_path, File.WRITE)
-	file.store_string(to_json(output))
+	file.store_string(JSON.print(output, "\t"))
 	file.close()
 	
 	# Alert the main scene that a save just happened
@@ -420,10 +451,12 @@ func _on_Options_add_pressed(caller):
 	
 	if !caller.conditions_visible:
 		condition.visible = false
-	
+	var col = Color(1, 1, 1)
 	undo_redo.create_action("Add option to %s" % [caller.name])
 	undo_redo.add_do_method(caller, "add_child", new_option)
+	undo_redo.add_do_method(caller, "add_slot")
 	undo_redo.add_undo_method(caller, "remove_child", new_option)
+	undo_redo.add_undo_method(caller, "remove_slot")
 	undo_redo.commit_action()
 
 
@@ -437,7 +470,9 @@ func _on_Options_remove_pressed(caller):
 	
 	undo_redo.create_action("Remove option from %s" % [caller.name])
 	undo_redo.add_do_method(caller, "remove_child", option)
+	undo_redo.add_do_method(caller, "remove_slot")
 	undo_redo.add_undo_method(caller, "add_child", option)
+	undo_redo.add_undo_method(caller, "add_slot")
 	undo_redo.commit_action()
 
 

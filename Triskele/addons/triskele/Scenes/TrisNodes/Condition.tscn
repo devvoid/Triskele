@@ -15,27 +15,34 @@ resizable = true
 slot/0/left_enabled = true
 slot/0/left_type = 0
 slot/0/left_color = Color( 1, 1, 1, 1 )
-slot/0/right_enabled = true
+slot/0/right_enabled = false
 slot/0/right_type = 0
-slot/0/right_color = Color( 0, 1, 0.180392, 1 )
+slot/0/right_color = Color( 1, 1, 1, 1 )
 slot/1/left_enabled = false
 slot/1/left_type = 0
 slot/1/left_color = Color( 1, 1, 1, 1 )
 slot/1/right_enabled = true
 slot/1/right_type = 0
-slot/1/right_color = Color( 1, 0, 0, 1 )
+slot/1/right_color = Color( 0, 1, 0.0392157, 1 )
+slot/2/left_enabled = false
+slot/2/left_type = 0
+slot/2/left_color = Color( 1, 1, 1, 1 )
+slot/2/right_enabled = true
+slot/2/right_type = 0
+slot/2/right_color = Color( 0.984314, 0.0823529, 0.0823529, 1 )
 script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LineEdit" type="LineEdit" parent="."]
+[node name="Condition" type="LineEdit" parent="."]
 margin_left = 28.0
 margin_top = 24.0
 margin_right = 222.0
 margin_bottom = 46.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+placeholder_text = "Condition"
 
 [node name="Label" type="Label" parent="."]
 margin_left = 28.0
@@ -44,3 +51,13 @@ margin_right = 222.0
 margin_bottom = 69.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+text = "True"
+align = 2
+
+[node name="Label2" type="Label" parent="."]
+margin_left = 28.0
+margin_top = 70.0
+margin_right = 222.0
+margin_bottom = 92.0
+text = "False"
+align = 2

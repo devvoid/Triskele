@@ -63,7 +63,6 @@ __meta__ = {
 }
 
 [node name="SaveDialog" type="FileDialog" parent="."]
-visible = true
 anchor_left = 0.1
 anchor_top = 0.1
 anchor_right = 0.9

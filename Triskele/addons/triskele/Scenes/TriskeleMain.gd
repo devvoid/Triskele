@@ -75,7 +75,7 @@ func _setup_context_menu():
 	# Shortcuts (do we need these?)
 	var shortcut_save = ShortCut.new()
 	shortcut_save.shortcut = ProjectSettings.get("input/save")["events"][0]
-	$ContextMenu.set_item_shortcut(0, shortcut_save)
+	ContextMenu.set_item_shortcut(0, shortcut_save)
 	
 	# Signals
 
