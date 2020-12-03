@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://addons/triskele/Scenes/TriskeleEditor.gd" type="Script" id=1]
 [ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=2]
@@ -6,9 +6,12 @@
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0, 0, 0, 0.796078 )
 
+[sub_resource type="StyleBoxEmpty" id=2]
+
 [node name="TriskeleEditor" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource( 2 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -24,7 +27,6 @@ __meta__ = {
 }
 
 [node name="TextEditor" type="Control" parent="."]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
@@ -41,26 +43,67 @@ __meta__ = {
 
 [node name="TabContainer" type="TabContainer" parent="TextEditor"]
 anchor_left = 0.1
-anchor_top = 0.1
+anchor_top = 0.05
 anchor_right = 0.9
-anchor_bottom = 0.9
+anchor_bottom = 0.85
 tab_align = 0
 drag_to_rearrange_enabled = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="en_us" type="TextEdit" parent="TextEditor/TabContainer"]
+[node name="en_US" type="TextEdit" parent="TextEditor/TabContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 4.0
-margin_top = 32.0
-margin_right = -4.0
-margin_bottom = -4.0
+margin_left = 5.0
+margin_top = 29.0
+margin_right = -5.0
+margin_bottom = -5.0
 highlight_current_line = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="BottomPanel" type="HBoxContainer" parent="TextEditor"]
+anchor_left = 0.1
+anchor_top = 0.85
+anchor_right = 0.9
+anchor_bottom = 0.9
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="TextEditor/BottomPanel"]
+margin_top = 7.0
+margin_right = 112.0
+margin_bottom = 29.0
+text = "Translation key: "
+
+[node name="TranslationKey" type="LineEdit" parent="TextEditor/BottomPanel"]
+margin_left = 116.0
+margin_right = 329.0
+margin_bottom = 36.0
+hint_tooltip = "The translation key to use for this node. Leave blank to use the node name."
+size_flags_horizontal = 3
+placeholder_text = "[Node name]"
+
+[node name="VSeparator" type="VSeparator" parent="TextEditor/BottomPanel"]
+margin_left = 333.0
+margin_right = 973.0
+margin_bottom = 36.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+custom_styles/separator = SubResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CloseTextEditor" type="Button" parent="TextEditor/BottomPanel"]
+margin_left = 977.0
+margin_right = 1024.0
+margin_bottom = 36.0
+text = "Close"
 
 [node name="SaveDialog" type="FileDialog" parent="."]
 anchor_left = 0.1
@@ -79,4 +122,5 @@ current_path = "/home/void/Desktop/devvoid/Triskele/Triskele/"
 [connection signal="node_selected" from="GraphEdit" to="." method="_on_node_selected"]
 [connection signal="node_unselected" from="GraphEdit" to="." method="_on_node_unselected"]
 [connection signal="gui_input" from="TextEditor/Panel" to="." method="_on_Panel_gui_input"]
+[connection signal="pressed" from="TextEditor/BottomPanel/CloseTextEditor" to="." method="_on_CloseTextEditor_pressed"]
 [connection signal="file_selected" from="SaveDialog" to="." method="_on_SaveDialog_file_selected"]

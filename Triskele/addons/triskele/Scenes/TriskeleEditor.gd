@@ -133,14 +133,22 @@ func _save_file_internal():
 	var output = {
 		"version_major": 1,
 		"version_minor": 0,
+		"supported_languages": ["en_US"],
 		"nodes": {}
 	}
 	
 	# Use a second dictionary for the nodes to decrease nesting
 	var nodes: Dictionary
 	
-	# Fill dictionary with nodes
+	# Create a CSV file for translations
+	var translation = File.new()
+	var translation_path = file_path.replace(".tris", ".csv")
+	translation.open(translation_path, File.WRITE)
 	
+	# Add language header to the CSV File
+	translation.store_csv_line(["", "en_US"])
+	
+	# Fill dictionary with nodes
 	## Step 1: Fill with nodes
 	for i in Graph.get_children():
 		# If it isn't a tris node, we don't care, ignore it.
@@ -163,12 +171,20 @@ func _save_file_internal():
 				current_node["type"] = "End"
 			
 			# Dialog node
-			# TODO: For now, just write en_us to the file. In future, write
-			# all text to a separate CSV file.
 			"TrisDialogNode":
 				current_node["type"] = "Dialog"
 				current_node["next"] = "NULL"
-				print("unfinished!!!")
+				
+				# Get the translation key
+				var translation_key
+				# If no explicit translation key is defined, use the node name
+				if i.translation_key == "":
+					translation_key = i.name
+				else:
+					translation_key = i.translation_key
+				
+				# Write to the CSV file, using the name as a translation key
+				translation.store_csv_line([translation_key, i.text["en_US"]])
 			
 			# Expression node just needs to write its expression
 			"TrisExpressionNode":
@@ -271,6 +287,7 @@ func _on_add_node(node_id):
 	match node_id:
 		1:
 			new_node = NodeDialog.instance()
+			new_node.connect("clicked", self, "_on_Dialog_clicked", [new_node])
 		2:
 			new_node = NodeExpression.instance()
 		3:
@@ -381,6 +398,7 @@ func _on_node_close_request(caller):
 
 
 func _on_connection_request(from, from_slot, to, to_slot):
+	# TODO: Remove any old connections with the same from_slot
 	undo_redo.create_action("Connect node %s to %s" % [from, to])
 	undo_redo.add_do_method(Graph, "connect_node", from, from_slot, to, to_slot)
 	undo_redo.add_do_method(self, "_on_edit")
@@ -429,7 +447,7 @@ func _on_Panel_gui_input(event):
 		if event.button_index != BUTTON_LEFT and event.button_index != BUTTON_RIGHT:
 			return
 		
-		TextEditor.hide()
+		_on_CloseTextEditor_pressed()
 
 
 # Add a new option to an Options node
@@ -479,3 +497,22 @@ func _on_Options_remove_pressed(caller):
 func _on_SaveDialog_file_selected(path):
 	file_path = path
 	_save_file_internal()
+
+
+func _on_Dialog_clicked(caller):
+	# Make the caller our selected node, so we can find it again later
+	selected_node = caller
+	Graph.set_selected(caller)
+	
+	# Initialize the text editor to the node's data
+	TextEditor.get_node("TabContainer/en_US").text = caller.text["en_US"]
+	TextEditor.get_node("BottomPanel/TranslationKey").text = caller.translation_key
+	
+	# Show the editor
+	TextEditor.show()
+
+
+func _on_CloseTextEditor_pressed():
+	# Save the data back to the node
+	selected_node.set_text("en_US", TextEditor.get_node("TabContainer/en_US").text)
+	selected_node.translation_key = TextEditor.get_node("BottomPanel/TranslationKey").text

@@ -22,6 +22,14 @@ var current_graph = null
 
 ## GODOT FUNCTIONS
 func _ready():
+	# Open files provided via command-line
+	# Necessary for Windows's open-with function to work
+	if !Engine.editor_hint:
+		for i in OS.get_cmdline_args():
+			if i.ends_with(".tris"):
+				_load_graph(i)
+	
+	# If none are provided, make a new empty graph.
 	if GraphsList.get_child_count() == 0:
 		EditorList.clear()
 		_add_graph()
@@ -63,7 +71,7 @@ func _notification(what):
 
 
 ## TRISKELE FUNCTIONS
-# Initialize all signals
+# Initialize PopupMenu signals
 func _setup_signals():
 	MenuBarFile.get_popup().connect("id_pressed", self, "_on_File_option_selected")
 	MenuBarEdit.get_popup().connect("id_pressed", self, "_on_Edit_option_selected")

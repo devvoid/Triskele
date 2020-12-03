@@ -26,7 +26,7 @@ __meta__ = {
 [node name="Preview" type="Label" parent="."]
 margin_left = 28.0
 margin_top = 24.0
-margin_right = 378.0
+margin_right = 222.0
 margin_bottom = 33.0
 hint_tooltip = "Click to open dialog editor"
 mouse_filter = 0
@@ -36,3 +36,4 @@ size_flags_vertical = 3
 autowrap = true
 clip_text = true
 [connection signal="resize_request" from="." to="." method="_on_Dialog_resize_request"]
+[connection signal="gui_input" from="Preview" to="." method="_on_Preview_gui_input"]
