@@ -121,7 +121,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ConfirmationDialog" type="ConfirmationDialog" parent="Popups"]
+[node name="ConfirmQuit" type="ConfirmationDialog" parent="Popups"]
 margin_right = 200.0
 margin_bottom = 70.0
 dialog_text = "There are unsaved changes; are you sure you want to quit?"
@@ -130,7 +130,7 @@ dialog_autowrap = true
 [node name="ContextMenu" type="PopupMenu" parent="Popups"]
 margin_right = 195.0
 margin_bottom = 106.0
-items = [ "Save", null, 0, false, false, 0, 0, null, "", false, "Save-As", null, 0, false, false, 1, 0, null, "", false, "Close", null, 0, false, false, 2, 0, null, "", false, "Close-All", null, 0, false, false, 3, 0, null, "", false, "Close Other Tabs", null, 0, false, false, 4, 0, null, "", false ]
+items = [ "Save", null, 0, false, false, 0, 0, null, "", false, "Save-As", null, 0, false, false, 1, 0, null, "", false, "Close", null, 0, false, false, 2, 0, null, "", false, "Close-All", null, 0, false, true, 3, 0, null, "", false, "Close Other Tabs", null, 0, false, true, 4, 0, null, "", false ]
 
 [node name="Load" type="FileDialog" parent="Popups"]
 anchor_left = 0.1
@@ -140,9 +140,16 @@ anchor_bottom = 0.9
 window_title = "Open a File"
 mode = 0
 filters = PoolStringArray( "*.tris ; Triskele files" )
+
+[node name="ConfirmClose" type="ConfirmationDialog" parent="Popups"]
+margin_right = 200.0
+margin_bottom = 70.0
+dialog_text = "The editor has unsaved changes, are you sure you want to close it?"
 [connection signal="gui_input" from="VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList" to="." method="_on_EditorList_gui_input"]
 [connection signal="item_selected" from="VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList" to="." method="_on_EditorList_item_selected"]
 [connection signal="gui_input" from="VBox1/HSplit1/Graphs/(new file)(*)" to="VBox1/HSplit1/Graphs/(new file)(*)" method="_on_GraphEdit_gui_input"]
+[connection signal="confirmed" from="Popups/ConfirmQuit" to="." method="_on_exit"]
 [connection signal="id_pressed" from="Popups/ContextMenu" to="." method="_on_ContextMenu_id_pressed"]
 [connection signal="mouse_exited" from="Popups/ContextMenu" to="." method="_on_ContextMenu_mouse_exited"]
 [connection signal="file_selected" from="Popups/Load" to="." method="_on_Load_file_selected"]
+[connection signal="confirmed" from="Popups/ConfirmClose" to="." method="_on_ConfirmClose_confirmed"]

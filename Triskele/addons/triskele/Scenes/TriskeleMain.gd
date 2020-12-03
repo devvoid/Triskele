@@ -13,7 +13,8 @@ onready var EditorList = $VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList
 
 onready var GraphsList = $VBox1/HSplit1/Graphs
 
-onready var ConfirmQuit = $Popups/ConfirmationDialog
+onready var ConfirmQuit = $Popups/ConfirmQuit
+onready var ConfirmClose = $Popups/ConfirmClose
 onready var ContextMenu = $Popups/ContextMenu
 onready var LoadDialog = $Popups/Load
 
@@ -26,7 +27,6 @@ func _ready():
 		_add_graph()
 	
 	_setup_signals()
-	_setup_context_menu()
 
 
 func _process(_delta):
@@ -65,19 +65,9 @@ func _notification(what):
 ## TRISKELE FUNCTIONS
 # Initialize all signals
 func _setup_signals():
-	ConfirmQuit.connect("confirmed", self, "_on_exit")
-	
 	MenuBarFile.get_popup().connect("id_pressed", self, "_on_File_option_selected")
-
-
-# Initialize ContextMenu
-func _setup_context_menu():
-	# Shortcuts (do we need these?)
-	var shortcut_save = ShortCut.new()
-	shortcut_save.shortcut = ProjectSettings.get("input/save")["events"][0]
-	ContextMenu.set_item_shortcut(0, shortcut_save)
-	
-	# Signals
+	MenuBarEdit.get_popup().connect("id_pressed", self, "_on_Edit_option_selected")
+	MenuBarHelp.get_popup().connect("id_pressed", self, "_on_Help_option_selected")
 
 
 # Add a new editor
@@ -157,6 +147,7 @@ func _on_File_option_selected(id):
 		3:
 			LoadDialog.popup()
 
+
 func _on_Edit_option_selected(id):
 	if !current_graph:
 		return
@@ -167,8 +158,10 @@ func _on_Edit_option_selected(id):
 		1:
 			current_graph.redo()
 
+
 func _on_Help_option_selected(_id):
 	OS.alert("There is no help.")
+
 
 # Switch graphs when an item in the EditorList is selected
 func _on_EditorList_item_selected(index):
@@ -192,7 +185,40 @@ func _on_ContextMenu_mouse_exited():
 
 
 func _on_ContextMenu_id_pressed(id):
-	pass # Replace with function body.
+	match id:
+		# Save
+		0:
+			if !current_graph:
+				return
+			
+			_save_graph(false, current_graph)
+		
+		# Save-As
+		1:
+			if !current_graph:
+				return
+			
+			_save_graph(true, current_graph)
+		
+		# Close
+		2:
+			# Only one graph can be selected at a time.
+			if EditorList.get_selected_items().empty():
+				return
+			var to_close = EditorList.get_selected_items()[0]
+			
+			if !GraphsList.get_child(to_close).is_saved:
+				ConfirmClose.popup_centered()
+			else:
+				_on_ConfirmClose_confirmed()
+		
+		# Close-All
+		3:
+			print("Unimplemented!")
+		
+		# Close Other Tabs
+		4:
+			print("Unimplemented!")
 
 
 # Load the file selected
@@ -204,3 +230,14 @@ func _on_Load_file_selected(path):
 func _on_Graph_edited(graph):
 	var index = GraphsList.get_children().find(graph)
 	EditorList.set_item_text(index, graph.file_path.get_file() + "(*)")
+
+
+func _on_ConfirmClose_confirmed():
+	# The EditorList only lets you select one item, so it'll always either be
+	# empty, or have just one entry
+	if EditorList.get_selected_items().empty():
+		return
+	var to_close = EditorList.get_selected_items()[0]
+	
+	GraphsList.get_child(to_close).queue_free()
+	EditorList.remove_item(to_close)
