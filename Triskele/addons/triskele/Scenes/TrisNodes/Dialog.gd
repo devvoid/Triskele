@@ -17,7 +17,6 @@ var text: Dictionary = {
 
 # TODO: Find a way to make Label stretch vertically to fit container
 func _ready():
-	print(get_children())
 	_on_Dialog_resize_request(rect_size)
 
 

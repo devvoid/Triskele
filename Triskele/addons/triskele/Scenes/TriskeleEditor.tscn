@@ -27,6 +27,7 @@ __meta__ = {
 }
 
 [node name="TextEditor" type="Control" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
@@ -115,12 +116,10 @@ access = 2
 filters = PoolStringArray( "*.tris ; Triskele file" )
 current_dir = "/home/void/Desktop/devvoid/Triskele/Triskele"
 current_path = "/home/void/Desktop/devvoid/Triskele/Triskele/"
-[connection signal="gui_input" from="." to="." method="_on_GraphEdit_gui_input"]
 [connection signal="connection_request" from="GraphEdit" to="." method="_on_connection_request"]
 [connection signal="disconnection_request" from="GraphEdit" to="." method="_on_disconnection_request"]
 [connection signal="gui_input" from="GraphEdit" to="." method="_on_GraphEdit_gui_input"]
 [connection signal="node_selected" from="GraphEdit" to="." method="_on_node_selected"]
-[connection signal="node_unselected" from="GraphEdit" to="." method="_on_node_unselected"]
 [connection signal="gui_input" from="TextEditor/Panel" to="." method="_on_Panel_gui_input"]
 [connection signal="pressed" from="TextEditor/BottomPanel/CloseTextEditor" to="." method="_on_CloseTextEditor_pressed"]
 [connection signal="file_selected" from="SaveDialog" to="." method="_on_SaveDialog_file_selected"]

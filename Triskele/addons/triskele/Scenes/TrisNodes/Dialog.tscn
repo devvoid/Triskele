@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=1]
 [ext_resource path="res://addons/triskele/Scenes/TrisNodes/Dialog.gd" type="Script" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.180392, 0.207843, 0.278431, 1 )
 
 [node name="Dialog" type="GraphNode" groups=[
 "trisnode",
@@ -27,12 +30,13 @@ __meta__ = {
 margin_left = 28.0
 margin_top = 24.0
 margin_right = 222.0
-margin_bottom = 33.0
+margin_bottom = 25.0
 hint_tooltip = "Click to open dialog editor"
 mouse_filter = 0
 mouse_default_cursor_shape = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
+custom_styles/normal = SubResource( 1 )
 autowrap = true
 clip_text = true
 [connection signal="resize_request" from="." to="." method="_on_Dialog_resize_request"]

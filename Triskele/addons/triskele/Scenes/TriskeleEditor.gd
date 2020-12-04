@@ -53,11 +53,13 @@ func _ready():
 	var start = NodeStart.instance()
 	start.name = "Start"
 	start.offset.x -= 400
+	start.connect("dragged", self, "_on_node_dragged", [start])
 	Graph.add_child(start)
 	
 	var end = NodeEnd.instance()
 	end.name = "End"
 	end.offset.x += 400
+	end.connect("dragged", self, "_on_node_dragged", [end])
 	Graph.add_child(end)
 	
 	# Select the Start node
@@ -498,6 +500,7 @@ func _on_add_node(node_id):
 	# Connect signals
 	new_node.connect("resize_request", self, "_on_node_resize_request", [new_node])
 	new_node.connect("close_request", self, "_on_node_close_request", [new_node])
+	new_node.connect("dragged", self, "_on_node_dragged", [new_node])
 	
 	# If we have a node selected, add this new one to the right of it.
 	if selected_node:
@@ -543,10 +546,6 @@ func _on_node_resize_request(new_minsize, caller):
 
 func _on_node_selected(node):
 	selected_node = node
-
-
-func _on_node_unselected(node):
-	selected_node = null
 
 
 func _on_node_close_request(caller):
@@ -612,15 +611,27 @@ func _on_disconnection_request(from, from_slot, to, to_slot):
 	undo_redo.commit_action()
 
 
-# Display add-node menu when EditorList is right-clicked
+# Display add-node menu when EditorList is right-clicked. Reset selected node to
+# null if it's a left click.
 func _on_GraphEdit_gui_input(event):
 	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_RIGHT and event.pressed:
+		# If the button wasn't pressed, we don't care
+		if !event.pressed:
+			return
+		
+		if event.button_index == BUTTON_RIGHT:
 			if !AddNodeButton:
 				return
 			
 			AddNodeButton.get_popup().rect_position = event.global_position
 			AddNodeButton.get_popup().show()
+		
+		# Doesn't work right now due to an engine bug; GraphNodes with mouse
+		# filter "Stop" don't block signals from going to the parent like they
+		# should.
+		if event.button_index == BUTTON_LEFT:
+			pass
+			#selected_node = null
 
 
 # Hide the AddNodeMenu popup when the mouse exits
@@ -715,3 +726,10 @@ func _on_CloseTextEditor_pressed():
 	
 	# Hide the text editor
 	TextEditor.hide()
+
+
+func _on_node_dragged(from, to, caller):
+	undo_redo.create_action("Move node %s" % [caller.name])
+	undo_redo.add_do_property(caller, "offset", to)
+	undo_redo.add_undo_property(caller, "offset", from)
+	undo_redo.commit_action()
