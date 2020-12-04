@@ -17,6 +17,7 @@ var text: Dictionary = {
 
 # TODO: Find a way to make Label stretch vertically to fit container
 func _ready():
+	print(get_children())
 	_on_Dialog_resize_request(rect_size)
 
 
@@ -31,6 +32,10 @@ func is_class(name):
 func set_text(locale: String, new_text: String):
 	text[locale] = new_text
 	$Preview.text = new_text
+
+
+func update_preview():
+	$Preview.text = text["en_US"]
 
 
 func _on_Dialog_resize_request(new_minsize):

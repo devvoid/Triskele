@@ -14,7 +14,7 @@ func get_visible_name():
 
 
 func get_recognized_extensions():
-	return ["json"]
+	return ["tris"]
 
 
 func get_save_extension():
@@ -54,7 +54,20 @@ func import(source_file, save_path, options, r_platform_variants, r_gen_files):
 	if file.open(source_file, File.READ) != OK:
 		return FAILED
 	
+	# Create dialog tree and load json
 	var output = TriskeleDialogTree.new()
-	output.test = int(file.get_as_text())
+	var data = parse_json(file.get_as_text())
 	
+	# Remove un-needed keys
+	for i in data["nodes"].keys():
+		data["nodes"][i].erase("position")
+		data["nodes"][i].erase("size")
+		data["nodes"][i].erase("name")
+	
+	output.version = "%s.%s" % [data["version_major"], data["version_minor"]]
+	output.translation_path = data["translation_file"]
+	output.supported_languages = data["supported_languages"]
+	output.nodes = data["nodes"]
+	
+	# Add nodes to output file, then save
 	return ResourceSaver.save("%s.%s" % [save_path, get_save_extension()], output)

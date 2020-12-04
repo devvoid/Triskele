@@ -108,12 +108,12 @@ func _load_graph(load_path: String):
 	
 	new_graph.name = load_path.get_file()
 	
-	new_graph.load_file(load_path)
-	
 	GraphsList.add_child(new_graph)
 	EditorList.add_item(load_path.get_file())
 	
 	EditorList.select(EditorList.get_item_count() - 1)
+	
+	new_graph.load_file(load_path)
 	
 	current_graph = new_graph
 

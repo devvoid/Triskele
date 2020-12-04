@@ -53,6 +53,7 @@ __meta__ = {
 }
 
 [node name="Help" type="MenuButton" parent="VBox1/MenuBar"]
+visible = false
 margin_left = 79.0
 margin_right = 121.0
 margin_bottom = 22.0

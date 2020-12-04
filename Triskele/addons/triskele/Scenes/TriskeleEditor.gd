@@ -4,7 +4,9 @@ extends Control
 signal save_finished
 signal edited
 
-# TODO: Use class names to remove these
+# NOTE: Using class_name.new() results in not creating any of the children nodes.
+# This could probably be gotten around by overloading the new() function, but
+# doing it this way is simpler for now.
 onready var NodeStart = preload("res://addons/triskele/Scenes/TrisNodes/Start.tscn")
 onready var NodeDialog = preload("res://addons/triskele/Scenes/TrisNodes/Dialog.tscn")
 onready var NodeExpression = preload("res://addons/triskele/Scenes/TrisNodes/Expression.tscn")
@@ -83,8 +85,9 @@ func redo():
 # Get rid of all tris nodes to empty the graph
 func _clear_nodes():
 	for i in Graph.get_children():
-		if i.is_in_group("trisnodes"):
-			i.queue_free()
+		if i.is_in_group("trisnode"):
+			# queue_free() doesn't properly delete Start/End; engine bug?
+			i.free()
 
 
 # Setup the "Add Node" button
@@ -134,6 +137,7 @@ func _save_file_internal():
 		"version_major": 1,
 		"version_minor": 0,
 		"supported_languages": ["en_US"],
+		"translation_file": file_path.get_file().replace(".tris", ".csv"),
 		"nodes": {}
 	}
 	
@@ -147,6 +151,8 @@ func _save_file_internal():
 	
 	# Add language header to the CSV File
 	translation.store_csv_line(["", "en_US"])
+	# Godot can't properly parse a translation file if it doesn't have any keys
+	translation.store_csv_line(["TRISDUMMY", "Placeholder!"])
 	
 	# Fill dictionary with nodes
 	## Step 1: Fill with nodes
@@ -158,7 +164,7 @@ func _save_file_internal():
 		# Write info that all nodes have (name, position, size)
 		var current_node = {}
 		current_node["name"] = i.name
-		current_node["position"] = i.rect_position
+		current_node["position"] = i.offset
 		current_node["size"] = i.rect_size
 		
 		# Write node-specific info, and type
@@ -179,9 +185,12 @@ func _save_file_internal():
 				var translation_key
 				# If no explicit translation key is defined, use the node name
 				if i.translation_key == "":
-					translation_key = i.name
+					translation_key = i.name.to_upper()
 				else:
 					translation_key = i.translation_key
+				
+				# Add key to the node
+				current_node["translation_key"] = translation_key
 				
 				# Write to the CSV file, using the name as a translation key
 				translation.store_csv_line([translation_key, i.text["en_US"]])
@@ -259,7 +268,9 @@ func _save_file_internal():
 		# For Condition, set true to the first member and false to the second
 		elif nodes[key].has("next_true"):
 			nodes[key]["next_true"] = connection_list[key][0]
-			nodes[key]["next_false"] = connection_list[key][1]
+			
+			if nodes[key].has("next_false"):
+				nodes[key]["next_false"] = connection_list[key][1]
 		
 		# Options is just Dialog but in a loop.
 		elif nodes[key].has("options"):
@@ -285,18 +296,183 @@ func _save_file_internal():
 
 # Load file from the disk
 func load_file(load_path: String):
+	_clear_nodes()
+	
 	# Load name and data from the provided file
 	file_path = load_path
 	name = load_path.get_file()
 	
 	var file = File.new()
 	file.open(load_path, File.READ)
-	var json = file.get_as_text()
+	var data = parse_json(file.get_as_text())
+	file.close()
+	
+	# Check version
+	if data["version_major"] != 1 and data["version_minor"] != 0:
+		print("[WARNING]: Version mismatched in opened file! Errors may occur.")
+	
+	# Load translation
+	var file_trans = File.new()
+	file_trans.open(data["translation_file"], File.READ)
+	# Parse the translation
+	
+	# Languages supported
+	var languages = file_trans.get_csv_line()
+	
+	# Translation hash. Stored in format {"key": {"lang1": "translated", ...}, ...}
+	var translation = {}
+	
+	# As of right now there doesn't seem to be a way to get all lines in a CSV
+	# file, but when reading beyond the end of the file, the result is just an
+	# empty PoolStringArray. We can use that to break when everything is loaded.
+	
+	# NOTE: For some reason, the empty PoolStringArray you get has a size of 1,
+	# NOT 0.
+	
+	# NOTE: If using a manually-edited translation file, adding empty rows will
+	# cause this to not load all the translations!!!
+	while true:
+		var next_key = file_trans.get_csv_line()
+		
+		if next_key.size() == 1:
+			break
+		
+		var new_key = {}
+		
+		var new_key_name
+		
+		for i in next_key.size():
+			# First element is the key name
+			if i == 0:
+				new_key_name = next_key[0]
+				continue
+			
+			# Next elements are the languages, in order.
+			new_key[languages[i]] = next_key[i]
+		
+		translation[new_key_name] = new_key
+	
+	# We don't need the translation file anymore, so close.
+	file_trans.close()
 	
 	# Load the data
 	## Step 1: Load all nodes
+	var nodes = data["nodes"]
+	
+	for node in nodes.values():
+		# The node being loaded
+		var new_node
+		
+		# Create node and set type-specific stuff
+		match node["type"]:
+			# Start and End have no specific stuff, but default is used for
+			# catching unknown node types
+			"Start":
+				new_node = NodeStart.instance()
+			"End":
+				new_node = NodeEnd.instance()
+			
+			# Dialog node
+			"Dialog":
+				var transkey = node["translation_key"]
+				
+				new_node = NodeDialog.instance()
+				
+				new_node.translation_key = transkey
+				new_node.text = translation[transkey]
+				
+				new_node.update_preview()
+				
+				new_node.connect("clicked", self, "_on_Dialog_clicked", [new_node])
+			
+			# Expression node
+			"Expression":
+				var expression = node["expression"]
+				
+				new_node = NodeExpression.instance()
+				
+				new_node.get_node("Expression").text = expression
+			
+			# Options node
+			"Options":
+				var options = node["options"]
+				var uses_conditions = node["uses_conditions"]
+				
+				new_node = NodeOptions.instance()
+				
+				# Set conditions
+				new_node.set_conditions(uses_conditions)
+				
+				new_node.connect("add_pressed", self, "_on_Options_add_pressed", [new_node])
+				new_node.connect("remove_pressed", self, "_on_Options_remove_pressed", [new_node])
+				
+				for i in options.size():
+					var new_option = HSplitContainer.new()
+					
+					var condition = LineEdit.new()
+					condition.name = "Condition"
+					condition.placeholder_text = "Condition"
+					condition.size_flags_horizontal = SIZE_EXPAND_FILL
+					
+					var option_text = LineEdit.new()
+					option_text.name = "OptionText"
+					option_text.placeholder_text = "Option Text"
+					option_text.size_flags_horizontal = SIZE_EXPAND_FILL
+					
+					new_option.add_child(condition)
+					new_option.add_child(option_text)
+					
+					if !uses_conditions:
+						condition.visible = false
+					
+					new_node.add_child(new_option, true)
+					new_node.add_slot()
+			
+			# Condition node
+			"Condition":
+				var condition = node["condition"]
+				
+				new_node = NodeCondition.instance()
+				
+				new_node.get_node("Condition").text = condition
+			
+			_:
+				print("[ERROR]: Unknown node type %s" % [node["type"]])
+		
+		# Set type-independent stuff
+		
+		var node_size = node["size"].replace('(', '').replace(')', '').split(',')
+		new_node.rect_size.x = float(node_size[0])
+		new_node.rect_size.y = float(node_size[1])
+		
+		var node_pos = node["position"].replace('(', '').replace(')', '').split(',')
+		new_node.offset.x = float(node_pos[0])
+		new_node.offset.y = float(node_pos[1])
+		
+		Graph.add_child(new_node)
+		new_node.name = node["name"]
+		new_node.set_title(node["name"])
 	
 	## Step 2: Connect all nodes
+	for node in nodes.values():
+		# Start, Dialog, Expression
+		if node.has("next"):
+			if node["next"] != "NULL":
+				Graph.connect_node(node["name"], 0, node["next"], 0)
+		
+		# Condition
+		if node.has("next_true"):
+			if node["next_true"] != "NULL":
+				Graph.connect_node(node["name"], 0, node["next_true"], 0)
+			
+			if node["next_false"] != "NULL":
+				Graph.connect_node(node["name"], 1, node["next_false"], 0)
+		
+		# Options
+		if node.has("options"):
+			for i in node["options"].size():
+				if node["options"][i]["next"] != "NULL":
+					Graph.connect_node(node["name"], i, node["options"][i]["next"], 0)
 
 
 ## SIGNALS
