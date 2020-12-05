@@ -4,6 +4,8 @@ extends Control
 signal save_finished
 signal edited
 
+const BACKUP_PATH = "user://backups/"
+
 # NOTE: Using class_name.new() results in not creating any of the children nodes.
 # This could probably be gotten around by overloading the new() function, but
 # doing it this way is simpler for now.
@@ -140,36 +142,29 @@ func _save_file_internal():
 	# folder.
 	var translation_path = file_path.replace(".tris", ".csv")
 	
-	# First things first, make a backup if these files already exist
-	# Godot doesn't have a File.copy() right now, so we have to manually load
-	# the file and save back
-	
-	var tris_backup_path = "user://backups/%s.bck" % [file_path.get_file()]
-	var trans_backup_path = "user://backups/%s.bck" % [translation_path.get_file()]
-	
-	var backup = File.new()
-	
-	if backup.file_exists(file_path):
-		# Read files into memory
-		backup.open(file_path, File.READ)
-		var tris_backup = backup.get_as_text()
-		backup.close()
+	# Backup files before attempting the save
+	# Check the background directory.
+	var backup_dir = Directory.new()
+	if !backup_dir.dir_exists(BACKUP_PATH):
+		var err = backup_dir.make_dir(BACKUP_PATH)
 		
-		# Write to .bck files
-		backup.open(tris_backup_path, File.WRITE)
-		backup.store_string(tris_backup)
-		backup.close()
+		if err:
+			print("[ERROR]: Unable to create backup directory!")
 	
-	# Do the same for the translation
-	if backup.file_exists(translation_path):
-		backup.open(translation_path, File.READ)
-		var trans_backup = backup.get_as_text()
-		backup.close()
-		
-		backup.open(trans_backup_path, File.WRITE)
-		backup.store_string(trans_backup)
-		backup.close()
+	backup_dir.open(BACKUP_PATH)
 	
+	# Get the paths
+	var tris_backup_path = "%s%s.bck" % [BACKUP_PATH, file_path.get_file()]
+	var trans_backup_path = "%s%s.bck" % [BACKUP_PATH, translation_path.get_file()]
+	
+	# Copy the files to the backup path
+	if backup_dir.file_exists(file_path):
+		backup_dir.copy(file_path, tris_backup_path)
+	
+	if backup_dir.file_exists(translation_path):
+		backup_dir.copy(translation_path, trans_backup_path)
+	
+	# Start saving
 	var output = {
 		"version_major": 1,
 		"version_minor": 0,
@@ -294,7 +289,8 @@ func _save_file_internal():
 	
 	## Step 3: Add all connections
 	for key in connection_list.keys():
-		# End has no connections.
+		# End has no connections; it will never appear as a key in the
+		# connections list
 		
 		# For Start, Dialog, and Expression, set "next" to first member of the
 		# connections array
@@ -334,6 +330,10 @@ func _save_file_internal():
 	file.open(file_path, File.WRITE)
 	file.store_string(JSON.print(output, "\t"))
 	file.close()
+	
+	# All done, so delete the backups
+	backup_dir.remove(tris_backup_path)
+	backup_dir.remove(trans_backup_path)
 	
 	# Alert the main scene that a save just happened
 	is_saved = true
