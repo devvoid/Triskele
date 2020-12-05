@@ -135,6 +135,41 @@ func save_file(save_as: bool = false):
 
 # Save the file to disk
 func _save_file_internal():
+	# TODO: Add a manual translation path, which works the same way as file_path,
+	# so that there can be a different translation path for storing in a sub-
+	# folder.
+	var translation_path = file_path.replace(".tris", ".csv")
+	
+	# First things first, make a backup if these files already exist
+	# Godot doesn't have a File.copy() right now, so we have to manually load
+	# the file and save back
+	
+	var tris_backup_path = "user://backups/%s.bck" % [file_path.get_file()]
+	var trans_backup_path = "user://backups/%s.bck" % [translation_path.get_file()]
+	
+	var backup = File.new()
+	
+	if backup.file_exists(file_path):
+		# Read files into memory
+		backup.open(file_path, File.READ)
+		var tris_backup = backup.get_as_text()
+		backup.close()
+		
+		# Write to .bck files
+		backup.open(tris_backup_path, File.WRITE)
+		backup.store_string(tris_backup)
+		backup.close()
+	
+	# Do the same for the translation
+	if backup.file_exists(translation_path):
+		backup.open(translation_path, File.READ)
+		var trans_backup = backup.get_as_text()
+		backup.close()
+		
+		backup.open(trans_backup_path, File.WRITE)
+		backup.store_string(trans_backup)
+		backup.close()
+	
 	var output = {
 		"version_major": 1,
 		"version_minor": 0,
@@ -148,7 +183,6 @@ func _save_file_internal():
 	
 	# Create a CSV file for translations
 	var translation = File.new()
-	var translation_path = file_path.replace(".tris", ".csv")
 	translation.open(translation_path, File.WRITE)
 	
 	# Add language header to the CSV File
@@ -269,9 +303,19 @@ func _save_file_internal():
 		
 		# For Condition, set true to the first member and false to the second
 		elif nodes[key].has("next_true"):
-			nodes[key]["next_true"] = connection_list[key][0]
+			# Check how many connections this node has.
+			var size = connection_list[key].size()
 			
-			if nodes[key].has("next_false"):
+			# If there are two connections, that means both True and False are
+			# connected. If there's only one, that means only one or the other
+			# is connected
+			
+			# NOTE: There currently isn't a way to detect which is which, so
+			# Triskele will always connect it to next_true.
+			if size == 1:
+				nodes[key]["next_true"] = connection_list[key][0]
+			else:
+				nodes[key]["next_true"] = connection_list[key][0]
 				nodes[key]["next_false"] = connection_list[key][1]
 		
 		# Options is just Dialog but in a loop.
@@ -313,9 +357,14 @@ func load_file(load_path: String):
 	if data["version_major"] != 1 and data["version_minor"] != 0:
 		print("[WARNING]: Version mismatched in opened file! Errors may occur.")
 	
+	var translation_path = (load_path.get_base_dir() + "/" + data["translation_file"])
+	
 	# Load translation
 	var file_trans = File.new()
-	file_trans.open(data["translation_file"], File.READ)
+	if !file.file_exists(translation_path):
+		print("[ERROR]: Translation file could not be found!")
+	
+	file_trans.open(translation_path, File.READ)
 	# Parse the translation
 	
 	# Languages supported
@@ -336,7 +385,7 @@ func load_file(load_path: String):
 	while true:
 		var next_key = file_trans.get_csv_line()
 		
-		if next_key.size() == 1:
+		if next_key.size() == 1 or next_key.size() == 0:
 			break
 		
 		var new_key = {}
