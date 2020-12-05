@@ -71,7 +71,7 @@ func _ready():
 # Undo the last action
 func undo():
 	if TextEditor.visible:
-		TextEditor.get_node("TabContainer/en_us").undo()
+		pass#TextEditor.get_node("TabContainer/en_US").undo()
 	else:
 		undo_redo.undo()
 
@@ -79,7 +79,7 @@ func undo():
 # Redo the last undone action
 func redo():
 	if TextEditor.visible:
-		TextEditor.get_node("TabContainer/en_us").redo()
+		pass#TextEditor.get_node("TabContainer/en_US").redo()
 	else:
 		undo_redo.redo()
 
@@ -717,6 +717,9 @@ func _on_Dialog_clicked(caller):
 	
 	# Show the editor
 	TextEditor.show()
+	
+	# Grab focus for the text editor
+	TextEditor.get_node("TabContainer/en_US").grab_focus()
 
 
 func _on_CloseTextEditor_pressed():

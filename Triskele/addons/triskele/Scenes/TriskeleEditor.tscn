@@ -61,6 +61,8 @@ margin_top = 29.0
 margin_right = -5.0
 margin_bottom = -5.0
 highlight_current_line = true
+smooth_scrolling = true
+wrap_enabled = true
 __meta__ = {
 "_edit_use_anchors_": false
 }

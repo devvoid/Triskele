@@ -1,7 +1,7 @@
 # Triskele usage
+**NOTE:** Triskele is still very new and can be very unstable. Save often, and make backups.
 
 ## Nodes
-
 ### Dialog Node
 The Dialog node is the main node type, and what most of your dialog tree will consist of. It contains text to be displayed by the game.
 
