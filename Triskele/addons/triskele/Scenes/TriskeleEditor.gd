@@ -460,14 +460,18 @@ func load_file(load_path: String):
 				for i in options.size():
 					var new_option = HSplitContainer.new()
 					
+					# Write text to these
+					
 					var condition = LineEdit.new()
 					condition.name = "Condition"
 					condition.placeholder_text = "Condition"
+					condition.text = options[i]["condition"]
 					condition.size_flags_horizontal = SIZE_EXPAND_FILL
 					
 					var option_text = LineEdit.new()
 					option_text.name = "OptionText"
 					option_text.placeholder_text = "Option Text"
+					option_text.text = options[i]["option"]
 					option_text.size_flags_horizontal = SIZE_EXPAND_FILL
 					
 					new_option.add_child(condition)

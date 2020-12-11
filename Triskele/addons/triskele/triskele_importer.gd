@@ -1,6 +1,8 @@
 tool
 extends EditorImportPlugin
 
+onready var RESOURCE_FORMAT = preload("res://addons/triskele/triskele_dialog_tree.gd")
+
 
 enum Presets { DEFAULT }
 
@@ -55,7 +57,7 @@ func import(source_file, save_path, options, r_platform_variants, r_gen_files):
 		return FAILED
 	
 	# Create dialog tree and load json
-	var output = TriskeleDialogTree.new()
+	var output = RESOURCE_FORMAT.new()
 	var data = parse_json(file.get_as_text())
 	
 	# Remove un-needed keys

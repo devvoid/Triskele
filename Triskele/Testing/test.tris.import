@@ -1,0 +1,13 @@
+[remap]
+
+importer="void.triskele"
+type="Resource"
+path="res://.import/test.tris-9910ea1a9ebafa073d474b6f8aaa3122.res"
+
+[deps]
+
+source_file="res://Testing/test.tris"
+dest_files=[ "res://.import/test.tris-9910ea1a9ebafa073d474b6f8aaa3122.res" ]
+
+[params]
+

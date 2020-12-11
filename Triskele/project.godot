@@ -38,11 +38,6 @@ _global_script_classes=[ {
 "class": "TrisStartNode",
 "language": "GDScript",
 "path": "res://addons/triskele/Scenes/TrisNodes/Start.gd"
-}, {
-"base": "Resource",
-"class": "TriskeleDialogTree",
-"language": "GDScript",
-"path": "res://addons/triskele/triskele_dialog_tree.gd"
 } ]
 _global_script_class_icons={
 "TrisConditionNode": "",
@@ -50,8 +45,7 @@ _global_script_class_icons={
 "TrisEndNode": "",
 "TrisExpressionNode": "",
 "TrisOptionsNode": "",
-"TrisStartNode": "",
-"TriskeleDialogTree": ""
+"TrisStartNode": ""
 }
 
 [application]
