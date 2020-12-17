@@ -17,7 +17,9 @@ The new display on the right is called a **graph**. You can add multiple graphs 
 Each graph contains **nodes**; there are two on the new graph you just created, a Start node and an End node. There are dots on the sides of the nodes; the dots on the left are called **input sockets**, while the dots on the right are **output sockets**.
 
 > **Note:** Each input socket must connect to only ONE output socket! As of right now, Triskele doesn't enforce this, but the resulting files will be invalid! In other words, this is valid:
+> 
 > ![Sockets (Valid)](Images/SocketValid.png)
+> 
 > This is not:
 > ![Sockets (Invalid)](Images/SocketInvalid.png)
 
