@@ -15,13 +15,16 @@ onready var GraphsList = $VBox1/HSplit1/Graphs
 
 onready var ConfirmQuit = $Popups/ConfirmQuit
 onready var ConfirmClose = $Popups/ConfirmClose
-onready var ContextMenu = $Popups/ContextMenu
 onready var LoadDialog = $Popups/Load
 
+# A reference to the current graph
 var current_graph = null
 
 # A reference to the editor interface; used to get the keybinds
 var editor_settings = null
+
+# Whether or not the MenuBarFile popup was opened by right-clicking graph list.
+var context_menu_opened = false
 
 ## GODOT FUNCTIONS
 func _ready():
@@ -58,9 +61,15 @@ func _notification(what):
 ## TRISKELE FUNCTIONS
 # Initialize PopupMenu signals
 func _setup_signals():
-	MenuBarFile.get_popup().connect("id_pressed", self, "_on_File_option_selected")
-	MenuBarEdit.get_popup().connect("id_pressed", self, "_on_Edit_option_selected")
-	MenuBarHelp.get_popup().connect("id_pressed", self, "_on_Help_option_selected")
+	var popupFile = MenuBarFile.get_popup()
+	var popupEdit = MenuBarEdit.get_popup()
+	var popupHelp = MenuBarHelp.get_popup()
+	
+	popupFile.connect("id_pressed", self, "_on_File_option_selected")
+	popupEdit.connect("id_pressed", self, "_on_Edit_option_selected")
+	popupHelp.connect("id_pressed", self, "_on_Help_option_selected")
+	
+	popupFile.connect("mouse_exited", self, "_on_menu_mouse_exit", [popupFile])
 
 
 # Add all keybinds
@@ -72,6 +81,7 @@ func _setup_keybinds():
 	var FileSave = ShortCut.new()
 	var FileSaveAs = ShortCut.new()
 	var FileOpenFile = ShortCut.new()
+	var FileCloseFile = ShortCut.new()
 	
 	var EditUndo = ShortCut.new()
 	var EditRedo = ShortCut.new()
@@ -107,6 +117,11 @@ func _setup_keybinds():
 	HotkeyOpenFile.scancode = KEY_O
 	FileOpenFile.shortcut = HotkeyOpenFile
 	
+	var HotkeyCloseFile = InputEventKey.new()
+	HotkeyCloseFile.control = true
+	HotkeyCloseFile.scancode = KEY_W
+	FileCloseFile.shortcut = HotkeyCloseFile
+	
 	var HotkeyUndo = InputEventKey.new()
 	HotkeyUndo.control = true
 	HotkeyUndo.scancode = KEY_Z
@@ -128,6 +143,7 @@ func _setup_keybinds():
 	filePopup.set_item_shortcut(2, FileSave)
 	filePopup.set_item_shortcut(3, FileSaveAs)
 	filePopup.set_item_shortcut(5, FileOpenFile)
+	filePopup.set_item_shortcut(7, FileCloseFile)
 	
 	var editPopup = MenuBarEdit.get_popup()
 	editPopup.set_item_shortcut(0, EditUndo)
@@ -198,21 +214,42 @@ func _on_exit():
 
 # When an option in the File menu is selected
 func _on_File_option_selected(id):
+	context_menu_opened = false
+	
 	match id:
+		# New File
 		0:
 			_add_graph()
+		
+		# Save
 		1:
 			if !current_graph:
 				return
 			
 			_save_graph(false, current_graph)
+		
+		# Save-As
 		2:
 			if !current_graph:
 				return
 			
 			_save_graph(true, current_graph)
+		
+		# Open File
 		3:
 			LoadDialog.popup()
+		
+		# Close
+		4:
+			if EditorList.get_selected_items().empty():
+				return
+			
+			var to_close = EditorList.get_selected_items()[0]
+			
+			if !GraphsList.get_child(to_close).is_saved:
+				ConfirmClose.popup_centered()
+			else:
+				_on_ConfirmClose_confirmed()
 
 
 func _on_Edit_option_selected(id):
@@ -243,50 +280,10 @@ func _on_EditorList_item_selected(index):
 func _on_EditorList_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_RIGHT and event.pressed:
-			ContextMenu.rect_position = event.global_position
-			ContextMenu.show()
-
-
-# Hide the context menu when the mouse exits it.
-func _on_ContextMenu_mouse_exited():
-	ContextMenu.hide()
-
-
-func _on_ContextMenu_id_pressed(id):
-	match id:
-		# Save
-		0:
-			if !current_graph:
-				return
-			
-			_save_graph(false, current_graph)
-		
-		# Save-As
-		1:
-			if !current_graph:
-				return
-			
-			_save_graph(true, current_graph)
-		
-		# Close
-		2:
-			# Only one graph can be selected at a time.
-			if EditorList.get_selected_items().empty():
-				return
-			var to_close = EditorList.get_selected_items()[0]
-			
-			if !GraphsList.get_child(to_close).is_saved:
-				ConfirmClose.popup_centered()
-			else:
-				_on_ConfirmClose_confirmed()
-		
-		# Close-All
-		3:
-			print("Unimplemented!")
-		
-		# Close Other Tabs
-		4:
-			print("Unimplemented!")
+			var popup = MenuBarFile.get_popup()
+			popup.rect_position = event.global_position - Vector2(10, 10)
+			popup.show()
+			context_menu_opened = true
 
 
 # Load the file selected
@@ -309,3 +306,9 @@ func _on_ConfirmClose_confirmed():
 	
 	GraphsList.get_child(to_close).queue_free()
 	EditorList.remove_item(to_close)
+
+
+func _on_menu_mouse_exit(menu):
+	if context_menu_opened:
+		menu.hide()
+		context_menu_opened = false

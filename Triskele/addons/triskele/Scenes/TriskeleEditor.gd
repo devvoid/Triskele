@@ -676,7 +676,7 @@ func _on_GraphEdit_gui_input(event):
 			if !AddNodeButton:
 				return
 			
-			AddNodeButton.get_popup().rect_position = event.global_position
+			AddNodeButton.get_popup().rect_position = event.global_position - Vector2(10, 10)
 			AddNodeButton.get_popup().show()
 		
 		# Doesn't work right now due to an engine bug; GraphNodes with mouse
