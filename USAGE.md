@@ -4,22 +4,22 @@
 ## Basic usage
 When you first open Triskele, this is what you'll see:
 
-![Triskele when first opened](Images/StartScene.png)
+![Triskele when first opened](Images/StartScreen.png)
 
 The dark-colored bar on the right is called the **graphs list**; it contains all opened files. For now, it's empty.
 
 By clicking the File button at the top-left, or right-clicking on the graphs list, you'll open a menu where you can add a new file. Once you do, you'll see this:
 
-![Triskele with a new graph added](Images/StartSceneWithNewGraph.png)
+![Triskele with a new graph added](Images/StartScreenWithNewGraph.png)
 
 The new display on the right is called a **graph**. You can add multiple graphs via New File or Open File, and switch between them by clicking its name on the graph list.
 
 Each graph contains **nodes**; there are two on the new graph you just created, a Start node and an End node. There are dots on the sides of the nodes; the dots on the left are called **input sockets**, while the dots on the right are **output sockets**.
 
 > **Note:** Each input socket must connect to only ONE output socket! As of right now, Triskele doesn't enforce this, but the resulting files will be invalid! In other words, this is valid:
-> ![Sockets (Valid)](Images/SocketsValid.png)
+> ![Sockets (Valid)](Images/SocketValid.png)
 > This is not:
-> ![Sockets (Invalid)](Images/SocketsInvalid.png)
+> ![Sockets (Invalid)](Images/SocketInvalid.png)
 
 The dialog tree starts at the Start node, and continues from socket to socket until it reaches the End node.
 
