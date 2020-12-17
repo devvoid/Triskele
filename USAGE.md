@@ -21,6 +21,7 @@ Each graph contains **nodes**; there are two on the new graph you just created, 
 > ![Sockets (Valid)](Images/SocketValid.png)
 > 
 > This is not:
+> 
 > ![Sockets (Invalid)](Images/SocketInvalid.png)
 
 The dialog tree starts at the Start node, and continues from socket to socket until it reaches the End node.
