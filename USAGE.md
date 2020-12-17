@@ -24,7 +24,9 @@ Each graph contains **nodes**; there are two on the new graph you just created, 
 > 
 > ![Sockets (Invalid)](Images/SocketInvalid.png)
 
-The dialog tree starts at the Start node, and continues from socket to socket until it reaches the End node.
+The dialog tree starts at the Start node, and continues from socket to socket until it reaches the End node. You can connect sockets by left-clicking and dragging from an output socket to an input socket. You can disconnect sockets by left-clicking and dragging from an input socket to a blank spot on the graph.
+
+By clicking the Add Node button on the graph, or right-clicking a blank space on the graph, a menu appears that lets you add new nodes to the graph. Node types are described below.
 
 ## Keybinds
 > **NOTE:** As of right now, these keybinds cannot be changed due to a limitation with Godot Engine. See [this issue](https://github.com/godotengine/godot/issues/44307) for more information.
