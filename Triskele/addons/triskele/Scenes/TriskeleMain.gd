@@ -20,8 +20,14 @@ onready var LoadDialog = $Popups/Load
 
 var current_graph = null
 
+# A reference to the editor interface; used to get the keybinds
+var editor_settings = null
+
 ## GODOT FUNCTIONS
 func _ready():
+	# Tool scripts add items to the list sometimes
+	EditorList.clear()
+	
 	# Open files provided via command-line
 	# Necessary for Windows's open-with function to work
 	if !Engine.editor_hint:
@@ -29,29 +35,8 @@ func _ready():
 			if i.ends_with(".tris"):
 				_load_graph(i)
 	
-	# If none are provided, make a new empty graph.
-	if GraphsList.get_child_count() == 0:
-		EditorList.clear()
-		_add_graph()
-	
 	_setup_signals()
-
-
-func _process(_delta):
-	if !current_graph:
-		return
-	
-	if Input.is_action_just_pressed("undo"):
-		current_graph.undo()
-	
-	if Input.is_action_just_pressed("redo"):
-		current_graph.redo()
-	
-	if Input.is_action_just_pressed("save"):
-		_save_graph(false, current_graph)
-	
-	if Input.is_action_just_pressed("save_as"):
-		_save_graph(true, current_graph)
+	_setup_keybinds()
 
 
 func _notification(what):
@@ -76,6 +61,80 @@ func _setup_signals():
 	MenuBarFile.get_popup().connect("id_pressed", self, "_on_File_option_selected")
 	MenuBarEdit.get_popup().connect("id_pressed", self, "_on_Edit_option_selected")
 	MenuBarHelp.get_popup().connect("id_pressed", self, "_on_Help_option_selected")
+
+
+# Add all keybinds
+# Note: In future, this should access keybinds from EditorSettings so that they
+# can be rebound; for now, we use one layout for both.
+# Issue: https://github.com/godotengine/godot/issues/44307
+func _setup_keybinds():
+	var FileNewFile = ShortCut.new()
+	var FileSave = ShortCut.new()
+	var FileSaveAs = ShortCut.new()
+	var FileOpenFile = ShortCut.new()
+	
+	var EditUndo = ShortCut.new()
+	var EditRedo = ShortCut.new()
+	
+	var HelpAbout = ShortCut.new()
+	
+	# Editor-only; do nothing for now
+	if Engine.editor_hint:
+		if editor_settings == null:
+			return
+		
+		# In future, set shortcuts based on EditorSettings
+	#else: # INDENT NEXT BLOCK & UNCOMMENT
+	# Standalone
+	var HotkeyNewFile = InputEventKey.new()
+	HotkeyNewFile.control = true
+	HotkeyNewFile.scancode = KEY_N
+	FileNewFile.shortcut = HotkeyNewFile
+	
+	var HotkeySave = InputEventKey.new()
+	HotkeySave.control = true
+	HotkeySave.scancode = KEY_S
+	FileSave.shortcut = HotkeySave
+	
+	var HotkeySaveAs = InputEventKey.new()
+	HotkeySaveAs.control = true
+	HotkeySaveAs.alt = true
+	HotkeySaveAs.scancode = KEY_S
+	FileSaveAs.shortcut = HotkeySaveAs
+	
+	var HotkeyOpenFile = InputEventKey.new()
+	HotkeyOpenFile.control = true
+	HotkeyOpenFile.scancode = KEY_O
+	FileOpenFile.shortcut = HotkeyOpenFile
+	
+	var HotkeyUndo = InputEventKey.new()
+	HotkeyUndo.control = true
+	HotkeyUndo.scancode = KEY_Z
+	EditUndo.shortcut = HotkeyUndo
+	
+	var HotkeyRedo = InputEventKey.new()
+	HotkeyRedo.control = true
+	HotkeyRedo.scancode = KEY_Y
+	EditRedo.shortcut = HotkeyRedo
+	
+	var HotkeyHelp = InputEventKey.new()
+	HotkeyHelp.control = true
+	HotkeyHelp.scancode = KEY_H
+	HelpAbout.shortcut = HotkeyHelp
+	
+	# Now set the hotkeys!
+	var filePopup = MenuBarFile.get_popup()
+	filePopup.set_item_shortcut(0, FileNewFile)
+	filePopup.set_item_shortcut(2, FileSave)
+	filePopup.set_item_shortcut(3, FileSaveAs)
+	filePopup.set_item_shortcut(5, FileOpenFile)
+	
+	var editPopup = MenuBarEdit.get_popup()
+	editPopup.set_item_shortcut(0, EditUndo)
+	editPopup.set_item_shortcut(1, EditRedo)
+	
+	var helpPopup = MenuBarHelp.get_popup()
+	helpPopup.set_item_shortcut(0, HelpAbout)
 
 
 # Add a new editor
@@ -173,6 +232,7 @@ func _on_Help_option_selected(_id):
 
 # Switch graphs when an item in the EditorList is selected
 func _on_EditorList_item_selected(index):
+	print(GraphsList)
 	if current_graph:
 		current_graph.hide()
 	current_graph = GraphsList.get_child(index)

@@ -107,7 +107,6 @@ margin_right = 200.0
 margin_bottom = 682.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-items = [ "(new file)(*)", null, false ]
 
 [node name="Graphs" type="Control" parent="VBox1/HSplit1"]
 margin_left = 208.0
@@ -148,7 +147,6 @@ margin_bottom = 70.0
 dialog_text = "The editor has unsaved changes, are you sure you want to close it?"
 [connection signal="gui_input" from="VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList" to="." method="_on_EditorList_gui_input"]
 [connection signal="item_selected" from="VBox1/HSplit1/StatusBar/Sidebar/Scroll/EditorList" to="." method="_on_EditorList_item_selected"]
-[connection signal="gui_input" from="VBox1/HSplit1/Graphs/(new file)(*)" to="VBox1/HSplit1/Graphs/(new file)(*)" method="_on_GraphEdit_gui_input"]
 [connection signal="confirmed" from="Popups/ConfirmQuit" to="." method="_on_exit"]
 [connection signal="id_pressed" from="Popups/ContextMenu" to="." method="_on_ContextMenu_id_pressed"]
 [connection signal="mouse_exited" from="Popups/ContextMenu" to="." method="_on_ContextMenu_mouse_exited"]

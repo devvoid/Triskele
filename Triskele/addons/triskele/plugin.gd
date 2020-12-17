@@ -11,6 +11,7 @@ var importer
 
 func _enter_tree():
 	editor = EditorPanel.instance()
+	editor.editor_settings = get_editor_interface().get_editor_settings()
 	get_editor_interface().get_editor_viewport().add_child(editor)
 	make_visible(false)
 	
