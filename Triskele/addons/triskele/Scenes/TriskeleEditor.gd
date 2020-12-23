@@ -149,7 +149,7 @@ func _save_file_internal():
 		var err = backup_dir.make_dir(BACKUP_PATH)
 		
 		if err:
-			print("[ERROR]: Unable to create backup directory!")
+			push_error("Unable to create backup directory!")
 	
 	backup_dir.open(BACKUP_PATH)
 	
@@ -320,7 +320,7 @@ func _save_file_internal():
 				nodes[key]["options"][i]["next"] = connection_list[key][i]
 		
 		else:
-			print("[ERROR]: Unknown node type!")
+			push_error("Unknown node type!")
 	
 	# Add nodes to main dictionary
 	output["nodes"] = nodes
@@ -355,14 +355,14 @@ func load_file(load_path: String):
 	
 	# Check version
 	if data["version_major"] != 1 and data["version_minor"] != 0:
-		print("[WARNING]: Version mismatched in opened file! Errors may occur.")
+		push_warning("Version mismatched in opened file! Errors may occur.")
 	
 	var translation_path = (load_path.get_base_dir() + "/" + data["translation_file"])
 	
 	# Load translation
 	var file_trans = File.new()
 	if !file.file_exists(translation_path):
-		print("[ERROR]: Translation file could not be found!")
+		push_error("Translation file could not be found!")
 	
 	file_trans.open(translation_path, File.READ)
 	# Parse the translation
@@ -492,7 +492,7 @@ func load_file(load_path: String):
 				new_node.get_node("Condition").text = condition
 			
 			_:
-				print("[ERROR]: Unknown node type %s" % [node["type"]])
+				push_error("Unknown node type %s" % [node["type"]])
 		
 		# Set type-independent stuff
 		
