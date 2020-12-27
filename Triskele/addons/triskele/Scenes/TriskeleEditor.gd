@@ -342,6 +342,10 @@ func _save_file_internal():
 
 # Load file from the disk
 func load_file(load_path: String):
+	# Since we're loading from a file, then by default it matches what that file
+	# contains. Therefore, we're saved.
+	is_saved = true
+	
 	_clear_nodes()
 	
 	# Load name and data from the provided file
