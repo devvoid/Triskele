@@ -8,3 +8,6 @@ export_presets.cfg
 
 # Triskele files
 *.tris
+
+# Test files; these are from an as-of-yet unreleased game, so no leaks!
+Testing/

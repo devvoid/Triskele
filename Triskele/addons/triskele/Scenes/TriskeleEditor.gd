@@ -504,6 +504,10 @@ func load_file(load_path: String):
 		new_node.offset.x = float(node_pos[0])
 		new_node.offset.y = float(node_pos[1])
 		
+		new_node.connect("resize_request", self, "_on_node_resize_request", [new_node])
+		new_node.connect("close_request", self, "_on_node_close_request", [new_node])
+		new_node.connect("dragged", self, "_on_node_dragged", [new_node])
+		
 		Graph.add_child(new_node)
 		new_node.name = node["name"]
 		new_node.set_title(node["name"])

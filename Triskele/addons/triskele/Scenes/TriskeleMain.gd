@@ -183,6 +183,8 @@ func _load_graph(load_path: String):
 	
 	new_graph.name = load_path.get_file()
 	
+	new_graph.connect("edited", self, "_on_Graph_edited", [new_graph])
+	
 	GraphsList.add_child(new_graph)
 	EditorList.add_item(load_path.get_file())
 	
