@@ -85,6 +85,7 @@ func _setup_keybinds():
 	
 	var EditUndo = ShortCut.new()
 	var EditRedo = ShortCut.new()
+	var EditEndNodeToCursor = ShortCut.new()
 	
 	var HelpAbout = ShortCut.new()
 	
@@ -132,6 +133,11 @@ func _setup_keybinds():
 	HotkeyRedo.scancode = KEY_Y
 	EditRedo.shortcut = HotkeyRedo
 	
+	var HotkeyEndNodeToCursor = InputEventKey.new()
+	HotkeyEndNodeToCursor.control = true
+	HotkeyEndNodeToCursor.scancode = KEY_E
+	EditEndNodeToCursor.shortcut = HotkeyEndNodeToCursor
+	
 	var HotkeyHelp = InputEventKey.new()
 	HotkeyHelp.control = true
 	HotkeyHelp.scancode = KEY_H
@@ -148,6 +154,7 @@ func _setup_keybinds():
 	var editPopup = MenuBarEdit.get_popup()
 	editPopup.set_item_shortcut(0, EditUndo)
 	editPopup.set_item_shortcut(1, EditRedo)
+	editPopup.set_item_shortcut(2, EditEndNodeToCursor)
 	
 	var helpPopup = MenuBarHelp.get_popup()
 	helpPopup.set_item_shortcut(0, HelpAbout)
@@ -263,6 +270,8 @@ func _on_Edit_option_selected(id):
 			current_graph.undo()
 		1:
 			current_graph.redo()
+		2:
+			current_graph.end_node_to_cursor()
 
 
 func _on_Help_option_selected(_id):

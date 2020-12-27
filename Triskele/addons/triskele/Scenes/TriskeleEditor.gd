@@ -26,7 +26,7 @@ onready var TextEditor = $TextEditor
 var file_path: String = ""
 
 # Whether or not all changes have been saved.
-# This is set to false in _on_edit, and true in save_file
+# This is set to false in _on_edit, and true in save_file and load_file
 # DO NOT SET THIS ANYWHERE ELSE
 var is_saved: bool = false
 
@@ -38,6 +38,9 @@ var AddNodeButton = null
 
 # The currently-selected node, used to select where the next node goes
 var selected_node = null
+
+# Whether or not the mouse is on this graph or not
+var mouse_on_graph = false
 
 ## Godot Functions
 func _ready():
@@ -538,6 +541,25 @@ func load_file(load_path: String):
 					Graph.connect_node(node["name"], i, node["options"][i]["next"], 0)
 
 
+func end_node_to_cursor():
+	var end_node = Graph.get_node("End")
+	
+	# Location where the node will be placed
+	var pos
+	
+	if mouse_on_graph:
+		# Get the mouse position relative to the Graph
+		pos = get_viewport().get_mouse_position()
+		pos += Graph.scroll_offset
+		pos -= Graph.rect_global_position
+	else:
+		# Get graph center
+		pos = Graph.rect_size / 2
+		pos += Graph.scroll_offset
+	
+	# Put node at final position
+	end_node.set_offset(pos)
+
 ## SIGNALS
 # Add node to the graph
 func _on_add_node(node_id):
@@ -798,3 +820,11 @@ func _on_node_dragged(from, to, caller):
 	undo_redo.add_do_property(caller, "offset", to)
 	undo_redo.add_undo_property(caller, "offset", from)
 	undo_redo.commit_action()
+
+
+func _on_Graph_mouse_entered():
+	mouse_on_graph = true
+
+
+func _on_GraphEdit_mouse_exited():
+	mouse_on_graph = false
