@@ -611,12 +611,13 @@ func _on_node_selected(node):
 
 func _on_node_close_request(caller):
 	# Get all connections that involve this node...
-	var connections = Graph.get_connection_list()
+	var raw_connections = Graph.get_connection_list()
+	var connections = []
 	
-	# Remove all connections that don't involve this node
-	for i in connections:
-		if i["from"] != caller.name and i["to"] != caller.name:
-			connections.erase(i)
+	# Add all connections that don't involve this node
+	for i in raw_connections:
+		if i["from"] == caller.name or i["to"] == caller.name:
+			connections.push_back(i)
 	
 	# Make action
 	undo_redo.create_action("Close node %s" % caller.name)
