@@ -170,7 +170,7 @@ func _save_file_internal():
 	# Start saving
 	var output = {
 		"version_major": 1,
-		"version_minor": 0,
+		"version_minor": 1,
 		"supported_languages": ["en_US"],
 		"translation_file": file_path.get_file().replace(".tris", ".csv"),
 		"nodes": {}
@@ -241,15 +241,23 @@ func _save_file_internal():
 				current_node["uses_conditions"] = i.conditions_visible
 				current_node["options"] = []
 				
-				for j in i.get_children():
+				for jc in i.get_child_count():
+					var j = i.get_child(jc)
+					
 					# Skip top bar
 					if j is HBoxContainer:
 						continue
 					
+					var trans_key = "%s_%s" % [i.name, jc]
+					
 					var new_option = {}
-					new_option["option"] = j.get_node("OptionText").get_text()
+					new_option["option"] = trans_key
 					new_option["condition"] = j.get_node("Condition").get_text()
 					new_option["next"] = "NULL"
+					
+					translation.store_csv_line(
+						[trans_key, j.get_node("OptionText").get_text()]
+					)
 					
 					current_node["options"].append(new_option)
 			
@@ -475,10 +483,21 @@ func load_file(load_path: String):
 					condition.text = options[i]["condition"]
 					condition.size_flags_horizontal = SIZE_EXPAND_FILL
 					
+					var trans_key = options[i]["option"]
+					
 					var option_text = LineEdit.new()
 					option_text.name = "OptionText"
 					option_text.placeholder_text = "Option Text"
-					option_text.text = options[i]["option"]
+					
+					#
+					if data["version_major"] == 1 and data["version_minor"] == 0:
+						option_text.text = trans_key
+					else:
+						# In version 1.0 of the tris format, the options text was
+						# directly stored in the Options entry itself. From 1.1
+						# onwards, options text is stored in the translation file.
+						option_text.text = translation[trans_key]["en_US"]
+					
 					option_text.size_flags_horizontal = SIZE_EXPAND_FILL
 					
 					new_option.add_child(condition)

@@ -8,6 +8,7 @@ signal add_pressed
 signal remove_pressed
 
 
+# Whether or not the conditions LineEdit is visible.
 var conditions_visible: bool = false
 
 
