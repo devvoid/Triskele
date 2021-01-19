@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://addons/triskele/Scenes/TriskeleEditor.gd" type="Script" id=1]
 [ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=2]
+
+[sub_resource type="ShaderMaterial" id=3]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0, 0, 0, 0.796078 )
@@ -9,6 +11,7 @@ bg_color = Color( 0, 0, 0, 0.796078 )
 [sub_resource type="StyleBoxEmpty" id=2]
 
 [node name="TriskeleEditor" type="Control"]
+material = SubResource( 3 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource( 2 )
@@ -118,12 +121,14 @@ access = 2
 filters = PoolStringArray( "*.tris ; Triskele file" )
 current_dir = "/home/void/Desktop/devvoid/Triskele/Triskele"
 current_path = "/home/void/Desktop/devvoid/Triskele/Triskele/"
+[connection signal="_end_node_move" from="GraphEdit" to="." method="_on_end_node_move"]
 [connection signal="connection_request" from="GraphEdit" to="." method="_on_connection_request"]
 [connection signal="disconnection_request" from="GraphEdit" to="." method="_on_disconnection_request"]
 [connection signal="gui_input" from="GraphEdit" to="." method="_on_GraphEdit_gui_input"]
 [connection signal="mouse_entered" from="GraphEdit" to="." method="_on_Graph_mouse_entered"]
 [connection signal="mouse_exited" from="GraphEdit" to="." method="_on_GraphEdit_mouse_exited"]
 [connection signal="node_selected" from="GraphEdit" to="." method="_on_node_selected"]
+[connection signal="node_unselected" from="GraphEdit" to="." method="_on_node_unselected"]
 [connection signal="gui_input" from="TextEditor/Panel" to="." method="_on_Panel_gui_input"]
 [connection signal="pressed" from="TextEditor/BottomPanel/CloseTextEditor" to="." method="_on_CloseTextEditor_pressed"]
 [connection signal="file_selected" from="SaveDialog" to="." method="_on_SaveDialog_file_selected"]

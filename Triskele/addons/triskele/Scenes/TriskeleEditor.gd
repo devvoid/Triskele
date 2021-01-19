@@ -579,6 +579,21 @@ func end_node_to_cursor():
 	# Put node at final position
 	end_node.set_offset(pos)
 
+
+func select_all():
+	for i in Graph.get_children():
+		if i is GraphNode:
+			Graph.set_selected(i)
+	push_error("Unimplemented!")
+
+
+func select_all_to_right():
+	push_error("Unimplemented!!")
+
+
+func select_all_to_left():
+	push_error("Unimplemented!!!")
+
 ## SIGNALS
 # Add node to the graph
 func _on_add_node(node_id):
@@ -648,6 +663,11 @@ func _on_node_resize_request(new_minsize, caller):
 
 func _on_node_selected(node):
 	selected_node = node
+
+
+func _on_node_unselected(node):
+	if selected_node == node:
+		selected_node = null
 
 
 func _on_node_close_request(caller):
@@ -847,3 +867,11 @@ func _on_Graph_mouse_entered():
 
 func _on_GraphEdit_mouse_exited():
 	mouse_on_graph = false
+
+
+func _on_GraphEdit_node_unselected(node):
+	print("Unselected: %s" % node.name)
+
+
+func _on_end_node_move():
+	_on_edit()

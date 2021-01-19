@@ -86,6 +86,9 @@ func _setup_keybinds():
 	var EditUndo = ShortCut.new()
 	var EditRedo = ShortCut.new()
 	var EditEndNodeToCursor = ShortCut.new()
+	var EditSelectAll = ShortCut.new()
+	var EditSelectAllToRight = ShortCut.new()
+	var EditSelectAllToLeft = ShortCut.new()
 	
 	var HelpAbout = ShortCut.new()
 	
@@ -137,6 +140,14 @@ func _setup_keybinds():
 	HotkeyEndNodeToCursor.control = true
 	HotkeyEndNodeToCursor.scancode = KEY_E
 	EditEndNodeToCursor.shortcut = HotkeyEndNodeToCursor
+	
+	var HotkeySelectAll = InputEventKey.new()
+	HotkeySelectAll.control = true
+	HotkeySelectAll.scancode = KEY_A
+	EditSelectAll.shortcut = HotkeySelectAll
+	
+	var HotkeySelectAllToRight = InputEventKey.new()
+	var HotkeySelectAllToLeft = InputEventKey.new()
 	
 	var HotkeyHelp = InputEventKey.new()
 	HotkeyHelp.control = true
@@ -272,6 +283,12 @@ func _on_Edit_option_selected(id):
 			current_graph.redo()
 		2:
 			current_graph.end_node_to_cursor()
+		3:
+			current_graph.select_all()
+		4:
+			current_graph.select_all_to_right()
+		5:
+			current_graph.select_all_to_left()
 
 
 func _on_Help_option_selected(_id):
