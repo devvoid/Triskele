@@ -330,6 +330,7 @@ func _on_ConfirmClose_confirmed():
 	# empty, or have just one entry
 	if EditorList.get_selected_items().empty():
 		return
+	
 	var to_close = EditorList.get_selected_items()[0]
 	
 	GraphsList.get_child(to_close).queue_free()

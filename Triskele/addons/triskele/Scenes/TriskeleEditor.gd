@@ -625,6 +625,11 @@ func _on_add_node(node_id):
 		new_position.x += selected_node.rect_size.x
 		new_position.x += 50
 		new_node.offset = new_position
+	# Else, put it in the middle of the screen
+	else:
+		var new_position = Graph.rect_size / 2
+		new_position += Graph.scroll_offset
+		new_node.offset = new_position
 	
 	# Add to the scene
 	undo_redo.create_action("Create node of type %s" % [node_id])
