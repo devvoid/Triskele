@@ -635,7 +635,9 @@ func _on_add_node(node_id):
 	undo_redo.create_action("Create node of type %s" % [node_id])
 	undo_redo.add_do_method(self, "_on_edit")
 	undo_redo.add_do_method(Graph, "add_child", new_node, true)
+	undo_redo.add_do_property(self, "selected_node", new_node)
 	undo_redo.add_undo_method(Graph, "remove_child", new_node)
+	undo_redo.add_undo_property(self, "selected_node", null)
 	undo_redo.add_undo_method(self, "_on_edit")
 	undo_redo.commit_action()
 	
@@ -702,6 +704,7 @@ func _on_node_close_request(caller):
 	# Remove the node and signal edit
 	undo_redo.add_do_method(Graph, "remove_child", caller)
 	undo_redo.add_do_method(self, "_on_edit")
+	undo_redo.add_do_property(self, "selected_node", null)
 	
 	# Re-add connections
 	for i in connections:
@@ -717,6 +720,7 @@ func _on_node_close_request(caller):
 	# Re-add node and signal edit
 	undo_redo.add_undo_method(Graph, "add_child", caller)
 	undo_redo.add_undo_method(self, "_on_edit")
+	undo_redo.add_undo_property(self, "selected_node", caller)
 	undo_redo.commit_action()
 
 
