@@ -147,7 +147,14 @@ func _setup_keybinds():
 	EditSelectAll.shortcut = HotkeySelectAll
 	
 	var HotkeySelectAllToRight = InputEventKey.new()
+	HotkeySelectAllToRight.control = true
+	HotkeySelectAllToRight.scancode = KEY_K
+	EditSelectAllToRight.shortcut = HotkeySelectAllToRight
+	
 	var HotkeySelectAllToLeft = InputEventKey.new()
+	HotkeySelectAllToLeft.control = true
+	HotkeySelectAllToLeft.scancode = KEY_J
+	EditSelectAllToLeft.shortcut = HotkeySelectAllToLeft
 	
 	var HotkeyHelp = InputEventKey.new()
 	HotkeyHelp.control = true
@@ -166,6 +173,9 @@ func _setup_keybinds():
 	editPopup.set_item_shortcut(0, EditUndo)
 	editPopup.set_item_shortcut(1, EditRedo)
 	editPopup.set_item_shortcut(2, EditEndNodeToCursor)
+	editPopup.set_item_shortcut(3, EditSelectAll)
+	editPopup.set_item_shortcut(4, EditSelectAllToRight)
+	editPopup.set_item_shortcut(5, EditSelectAllToLeft)
 	
 	var helpPopup = MenuBarHelp.get_popup()
 	helpPopup.set_item_shortcut(0, HelpAbout)

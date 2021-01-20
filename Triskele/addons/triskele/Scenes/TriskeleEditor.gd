@@ -583,16 +583,27 @@ func end_node_to_cursor():
 func select_all():
 	for i in Graph.get_children():
 		if i is GraphNode:
-			Graph.set_selected(i)
-	push_error("Unimplemented!")
+			i.selected = true
 
 
 func select_all_to_right():
-	push_error("Unimplemented!!")
+	if !selected_node:
+		return
+	
+	for i in Graph.get_children():
+		if i is GraphNode:
+			if i.offset.x > selected_node.offset.x:
+				i.selected = true
 
 
 func select_all_to_left():
-	push_error("Unimplemented!!!")
+	if !selected_node:
+		return
+	
+	for i in Graph.get_children():
+		if i is GraphNode:
+			if i.offset.x < selected_node.offset.x:
+				i.selected = true
 
 ## SIGNALS
 # Add node to the graph

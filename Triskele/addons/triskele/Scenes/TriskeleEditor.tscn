@@ -3,15 +3,15 @@
 [ext_resource path="res://addons/triskele/Scenes/TriskeleEditor.gd" type="Script" id=1]
 [ext_resource path="res://addons/triskele/DefaultTheme.theme" type="Theme" id=2]
 
-[sub_resource type="ShaderMaterial" id=3]
+[sub_resource type="ShaderMaterial" id=1]
 
-[sub_resource type="StyleBoxFlat" id=1]
+[sub_resource type="StyleBoxFlat" id=2]
 bg_color = Color( 0, 0, 0, 0.796078 )
 
-[sub_resource type="StyleBoxEmpty" id=2]
+[sub_resource type="StyleBoxEmpty" id=3]
 
 [node name="TriskeleEditor" type="Control"]
-material = SubResource( 3 )
+material = SubResource( 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource( 2 )
@@ -40,7 +40,7 @@ __meta__ = {
 [node name="Panel" type="Panel" parent="TextEditor"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-custom_styles/panel = SubResource( 1 )
+custom_styles/panel = SubResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -100,7 +100,7 @@ margin_bottom = 36.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
-custom_styles/separator = SubResource( 2 )
+custom_styles/separator = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
